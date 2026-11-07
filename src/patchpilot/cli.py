@@ -697,6 +697,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     bench_p.add_argument("--json", action="store_true", help="Emit JSON output.")
 
+    audit_diff_p = sub.add_parser(
+        "audit-diff",
+        help="Audit a multi-file unified git diff against RH001-RH008 rules.",
+    )
+    audit_diff_p.add_argument("diff_file", nargs="?", type=str, help="Path to diff file (or read stdin).")
+    audit_diff_p.add_argument("--json", action="store_true", help="Emit JSON output.")
+
+    export_aegis_p = sub.add_parser(
+        "export-aegis",
+        help="Export Nexus Aegis G5_ANTI_REWARD_HACK leaf attestation package.",
+    )
+    export_aegis_p.add_argument("diff_file", nargs="?", type=str, help="Path to diff file (or read stdin).")
+    export_aegis_p.add_argument("--task-id", type=str, default="patchpilot_cli_run")
+
     serve_p = sub.add_parser(
         "serve-stdio",
         help="Run the PatchPilot Model Context Protocol (MCP) JSON-RPC 2.0 server over stdio.",
@@ -720,6 +734,34 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "benchmark":
         run_benchmark(as_json=args.json)
+        return 0
+    if args.command == "audit-diff":
+        from patchpilot.diff_parser import audit_unified_diff
+
+        if args.diff_file:
+            diff_text = Path(args.diff_file).read_text(encoding="utf-8")
+        else:
+            diff_text = sys.stdin.read()
+        rep = audit_unified_diff(diff_text)
+        if args.json:
+            print(json.dumps(rep.to_dict(), indent=2))
+        else:
+            status = "APPROVED" if rep.approved else "REJECTED"
+            print(f"Patch Audit Verdict: {status} (Risk: {rep.risk_score:.4f}, Violations: {len(rep.violations)})")
+            for v in rep.violations:
+                print(f"  [{v.rule_id}] {v.file_path}:L{v.line_number} {v.message}")
+        return 0 if rep.approved else 1
+    if args.command == "export-aegis":
+        from patchpilot.aegis_bridge import create_aegis_g5_leaf
+        from patchpilot.diff_parser import audit_unified_diff
+
+        if args.diff_file:
+            diff_text = Path(args.diff_file).read_text(encoding="utf-8")
+        else:
+            diff_text = sys.stdin.read()
+        rep = audit_unified_diff(diff_text)
+        leaf = create_aegis_g5_leaf(rep, task_id=args.task_id)
+        print(json.dumps(leaf, indent=2))
         return 0
     if args.command == "serve-stdio":
         server = PatchPilotMCPServer(default_workspace=args.workspace)

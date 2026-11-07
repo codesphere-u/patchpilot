@@ -19,6 +19,32 @@ MCP_PROTOCOL_VERSION = "2024-11-05"
 
 MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
     {
+        "name": "audit_unified_diff",
+        "description": (
+            "Parse and audit a multi-file unified git diff against 8 deterministic AST "
+            "anti-reward-hacking & safety rules (RH001–RH008) and export canonical Nexus Aegis G5 leaf attestation."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "unified_diff": {
+                    "type": "string",
+                    "description": "Multi-file unified diff string (e.g. git diff output).",
+                },
+                "original_files": {
+                    "type": "object",
+                    "description": "Optional mapping of {rel_path: original_source_code}.",
+                },
+                "export_aegis": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": "Whether to include canonical Nexus Aegis G5 attestation package in output.",
+                },
+            },
+            "required": ["unified_diff"],
+        },
+    },
+    {
         "name": "localize_fault",
         "description": (
             "Rank suspect Python functions/methods from a traceback or pytest failure log "
@@ -188,7 +214,7 @@ class PatchPilotMCPServer:
                     "protocolVersion": MCP_PROTOCOL_VERSION,
                     "serverInfo": {
                         "name": "patchpilot-mcp",
-                        "version": "1.0.0",
+                        "version": "1.1.0",
                     },
                     "capabilities": {
                         "tools": {"listChanged": False},
@@ -229,6 +255,18 @@ class PatchPilotMCPServer:
             return self._error(req_id, -32603, f"Internal error: {exc}")
 
     def _dispatch_tool(self, tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
+        if tool_name == "audit_unified_diff":
+            from patchpilot.aegis_bridge import create_aegis_g5_leaf
+            from patchpilot.diff_parser import audit_unified_diff
+
+            diff_text = args["unified_diff"]
+            original_files = args.get("original_files")
+            report = audit_unified_diff(diff_text, original_files=original_files)
+            res = report.to_dict()
+            if args.get("export_aegis", False):
+                res["aegis_g5_leaf"] = create_aegis_g5_leaf(report)
+            return res
+
         if tool_name == "localize_fault":
             traceback_text = args["traceback_text"]
             sources = args.get("sources")

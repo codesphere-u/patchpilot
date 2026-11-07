@@ -30,6 +30,7 @@ def test_mcp_initialize_ping_and_tools_list():
     assert tool_names == {
         "localize_fault",
         "verify_patch_integrity",
+        "audit_unified_diff",
         "apply_transactional_patch",
         "inspect_ast_symbols",
     }
