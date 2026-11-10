@@ -142,12 +142,54 @@ else:
 
 ## Model Context Protocol (MCP) Server Integration
 
-`patchpilot` includes a full JSON-RPC 2.0 MCP server (`patchpilot serve-stdio`) exposing four deterministic tools to Claude Code, Cursor, OpenHands, or custom MCP clients:
+`patchpilot` includes a full JSON-RPC 2.0 MCP server exposing 5 deterministic tools to Claude Code, Cursor, OpenHands, or custom MCP clients:
 
-- `localize_fault`: Rank suspect functions from a traceback and return token-budgeted AST slices.
-- `verify_patch_integrity`: Evaluate a candidate patch or unified diff against `RH001`–`RH008`.
-- `apply_transactional_patch`: Apply a patch inside an atomic snapshot transaction with automatic SHA-256 rollback on guard or test failure.
-- `inspect_ast_symbols`: Query the workspace AST symbol table and caller/callee graph by name or `(file_path, line_number)`.
+| Tool Name | What is its use? (Purpose) | Key Arguments | Hosted on Vercel? | Typical Output |
+| :--- | :--- | :--- | :--- | :--- |
+| `audit_unified_diff` | Parse and audit a multi-file git diff against 8 AST anti-reward-hacking rules (`RH001`–`RH008`) and export a canonical Nexus Aegis G5 attestation package. | `unified_diff` (str), `original_files` (optional dict), `export_aegis` (bool) | **Yes (Public)** | `{"passed": true, "violations": [], "aegis_attestation": {...}}` |
+| `localize_fault` | Rank suspect functions from a traceback or pytest error log using hybrid Stack-Trace + AST Call-Graph + BM25 token overlap within a strict token budget. | `traceback_text` (str), `sources` (dict), `top_k` (int, default `5`), `token_budget` (int, default `1200`) | **Yes (Inline sources)** | `{"suspects": [{"symbol": "pricing.py::discount", "score": 0.94}], "ast_slices": "..."}` |
+| `verify_patch_integrity` | Statically verify that a proposed code patch does not modify tests (`RH001`), add assert true (`RH002`), or stub functions (`RH003`–`RH008`). | `original_files` (dict), `patched_files` (dict), `max_files_touched` (int) | **Yes (Public)** | `{"verdict": "PASSED", "clean": true, "violations": []}` |
+| `inspect_ast_symbols` | Query workspace AST symbol tables and caller/callee graphs by name or line number. | `sources` (dict), `query_name` (optional str), `file_path` (str), `line_number` (int) | **Yes (Inline sources)** | `{"symbols": [{"name": "calculate_tax", "kind": "function", "line": 42}]}` |
+| `apply_transactional_patch` | Apply a patch inside an atomic snapshot sandbox with automatic byte-exact SHA-256 rollback if tests fail or rules are violated. | `workspace_root` (str), `patched_files` (dict), `test_command` (list) | Local stdio | `{"status": "committed", "receipt_sha256": "..."}` |
+
+### Tool Usage Examples
+
+#### 1. `audit_unified_diff` — Blocking Agent Reward-Hacking in Git Diffs
+Detect if an autonomous coding agent attempted to pass CI by modifying test assertions or deleting failure checks:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "audit_unified_diff",
+    "arguments": {
+      "unified_diff": "--- a/tests/test_auth.py\n+++ b/tests/test_auth.py\n@@ -12,3 +12,3 @@\n-    assert token.is_valid()\n+    assert True",
+      "export_aegis": true
+    }
+  }
+}
+```
+
+#### 2. `localize_fault` — Pinpointing Root Cause from Pytest Failure Stacks
+Feed a raw stack trace to get exact line-numbered AST function slices within an 800-token budget:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "localize_fault",
+    "arguments": {
+      "traceback_text": "Traceback (most recent call last):\n  File \"billing.py\", line 42, in process_charge\n    return calculate_fee(amount) / zero_divisor\nZeroDivisionError: division by zero",
+      "sources": {
+        "billing.py": "def calculate_fee(amount):\n    return amount * 0.03\n\ndef process_charge(amount):\n    zero_divisor = 0\n    return calculate_fee(amount) / zero_divisor\n"
+      },
+      "token_budget": 800
+    }
+  }
+}
+```
 
 ### MCP Client Configuration (`claude_desktop_config.json` / `.cursor/mcp.json`)
 
@@ -186,10 +228,27 @@ curl -s -X POST https://patchpilot-eta.vercel.app/mcp -H 'Content-Type: applicat
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
-Client config (any Streamable-HTTP-capable MCP client):
+### Client Configuration
 
+#### 1. Claude Code CLI
+```bash
+# Add to current project:
+claude mcp add --transport http patchpilot https://patchpilot-eta.vercel.app/mcp
+
+# Or add globally across all projects:
+claude mcp add --scope user --transport http patchpilot https://patchpilot-eta.vercel.app/mcp
+```
+
+#### 2. Claude Desktop / Cursor / Windsurf (`mcp.json`)
 ```json
-{ "mcpServers": { "patchpilot": { "url": "https://patchpilot-eta.vercel.app/mcp" } } }
+{
+  "mcpServers": {
+    "patchpilot": {
+      "type": "http",
+      "url": "https://patchpilot-eta.vercel.app/mcp"
+    }
+  }
+}
 ```
 
 **Hosted limitations:** `apply_transactional_patch` (writes files, runs commands) is **disabled on the hosted endpoint**, and `localize_fault` / `inspect_ast_symbols` accept inline `sources` only (no `workspace_root`). Use the local stdio install for full functionality.
