@@ -77,10 +77,23 @@ INTERNAL_ERROR = -32603
 mcp_engine = PatchPilotMCPServer()
 
 app = FastAPI(
-    title="PatchPilot (hosted MCP)",
+    title=f"PatchPilot MCP Server ({SERVER_VERSION})",
+    description="Autonomous Patch Auditor, AST Symbol Verifier & Fault Localization Model Context Protocol (MCP) server running on Vercel Serverless. "
+                "Enforces diff safety, prevents test-deletion reward hacking, and localizes regression root causes. "
+                "Built by CodeSphere Innovations.",
     version=SERVER_VERSION,
     docs_url="/docs",
+    redoc_url="/redoc",
     openapi_url="/openapi.json",
+    contact={
+        "name": "Codesphere Innovations",
+        "url": "https://github.com/codesphere-u/patchpilot",
+        "email": "codesphereinnovationz@gmail.com",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
 )
 app.add_middleware(
     CORSMiddleware,

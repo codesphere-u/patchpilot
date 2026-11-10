@@ -7,7 +7,7 @@ name = "patchpilot"
 version = "1.1.0"
 description = "Autonomous Code Repair Engine: Stack-Trace & AST Fault Localizer, Anti-Reward-Hacking Patch Verifier, Transactional Sandbox & MCP Server."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.10"
 authors = [
     { name = "Akandwanaho Ivan Alvin", email = "codesphereinnovationz@gmail.com" }
@@ -25,7 +25,6 @@ keywords = [
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
