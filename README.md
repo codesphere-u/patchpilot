@@ -172,6 +172,30 @@ else:
 
 ---
 
+## Hosted endpoint (Vercel)
+
+A free, public, stateless deployment of PatchPilot runs over **MCP Streamable HTTP**:
+
+| | |
+|---|---|
+| MCP endpoint | `https://patchpilot-eta.vercel.app/mcp` (JSON-RPC 2.0 over `POST`) |
+| Health probe | `https://patchpilot-eta.vercel.app/health` |
+
+```bash
+curl -s -X POST https://patchpilot-eta.vercel.app/mcp -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+Client config (any Streamable-HTTP-capable MCP client):
+
+```json
+{ "mcpServers": { "patchpilot": { "url": "https://patchpilot-eta.vercel.app/mcp" } } }
+```
+
+**Hosted limitations:** `apply_transactional_patch` (writes files, runs commands) is **disabled on the hosted endpoint**, and `localize_fault` / `inspect_ast_symbols` accept inline `sources` only (no `workspace_root`). Use the local stdio install for full functionality.
+
+The hosted gateway is [`api/index.py`](api/index.py); it enforces a 1 MB body limit, strict JSON-RPC envelopes and the tool restrictions above. Deploy your own copy with `npx vercel deploy --prod` (entrypoint is configured in `pyproject.toml` under `[tool.vercel]`).
+
 ## License
 
 MIT License — Copyright (c) 2026 [Akandwanaho Ivan Alvin (`@codesphere-u`)](https://github.com/codesphere-u).

@@ -7,15 +7,13 @@
   "description": "Autonomous code repair engine with stack-trace fault localization, AST anti-reward-hacking verification, and transactional patch sandbox.",
   "type": "mcp_server",
   "status": "production",
-  "url": "https://patchpilot-eta.vercel.app/sse",
+  "url": "https://patchpilot-eta.vercel.app/mcp",
   "endpoints": {
-    "sse": "https://patchpilot-eta.vercel.app/sse",
-    "http": "https://patchpilot-eta.vercel.app/messages",
+    "streamable_http": "https://patchpilot-eta.vercel.app/mcp",
     "health": "https://patchpilot-eta.vercel.app/health"
   },
   "transport": [
-    "http",
-    "sse",
+    "streamable-http",
     "stdio"
   ],
   "keywords": [
