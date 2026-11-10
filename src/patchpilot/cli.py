@@ -683,7 +683,7 @@ def build_parser() -> argparse.ArgumentParser:
             "Anti-Reward-Hacking Patch Verifier, Transactional Sandbox & MCP Server."
         ),
     )
-    sub = parser.add_subparsers(dest="command", required=True)
+    sub = parser.add_subparsers(dest="command", required=False)
 
     demo_p = sub.add_parser(
         "demo",
@@ -724,6 +724,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run the PatchPilot Model Context Protocol (MCP) JSON-RPC 2.0 server over stdio.",
     )
     serve_p.add_argument(
+        "--workspace",
+        type=str,
+        default=None,
+        help="Optional default workspace directory path.",
+    )
+
+    mcp_p = sub.add_parser(
+        "mcp",
+        help="Run the PatchPilot Model Context Protocol (MCP) JSON-RPC 2.0 server over stdio (alias for serve-stdio).",
+    )
+    mcp_p.add_argument(
         "--workspace",
         type=str,
         default=None,
@@ -782,8 +793,9 @@ def main(argv: list[str] | None = None) -> int:
             httpd.server_close()
         return 0
 
-    if args.command == "serve-stdio":
-        server = PatchPilotMCPServer(default_workspace=args.workspace)
+    if args.command in ("serve-stdio", "mcp") or args.command is None:
+        workspace = getattr(args, "workspace", None)
+        server = PatchPilotMCPServer(default_workspace=workspace)
         server.serve_stdio()
         return 0
     return 1
