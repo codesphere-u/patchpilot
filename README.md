@@ -6,7 +6,7 @@
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://patchpilot-eta.vercel.app/mcp)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
-[![Glama Gateway](https://img.shields.io/badge/Glama-Verified-38bdf8)](https://glama.ai/mcp)
+[![Glama Score](https://glama.ai/mcp/servers/codesphere-u/patchpilot/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/patchpilot)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
 [![Tests Passed](https://img.shields.io/badge/tests-80%20passed-brightgreen.svg)](tests/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero%20runtime-success.svg)](#installation)
@@ -15,6 +15,12 @@
 **Stack-Trace & AST Call-Graph Fault Localizer, Deterministic Anti-Reward-Hacking Patch Verifier (`RH001`–`RH008`), Transactional Rollback Sandbox, and Model Context Protocol (MCP) Server for Autonomous Coding Agents.**
 
 > 🚀 **Live Interactive Developer Portal & Playground:** Visit [`https://patchpilot-eta.vercel.app`](https://patchpilot-eta.vercel.app) in your web browser to test diff auditing live, inspect schemas, and copy 1-click configurations for Claude Code, Cursor, Windsurf, and Claude Desktop.
+
+<p align="center">
+  <a href="https://glama.ai/mcp/servers/codesphere-u/patchpilot">
+    <img src="https://glama.ai/mcp/servers/codesphere-u/patchpilot/badges/card.svg" alt="patchpilot MCP server – quality and maintenance score on Glama" width="500" />
+  </a>
+</p>
 
 ---
 
