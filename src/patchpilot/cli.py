@@ -711,6 +711,14 @@ def build_parser() -> argparse.ArgumentParser:
     export_aegis_p.add_argument("diff_file", nargs="?", type=str, help="Path to diff file (or read stdin).")
     export_aegis_p.add_argument("--task-id", type=str, default="patchpilot_cli_run")
 
+    http_p = sub.add_parser(
+        "serve-http",
+        help="Run the PatchPilot Model Context Protocol (MCP) server over HTTP / SSE for cloud hosting.",
+    )
+    http_p.add_argument("--host", default="0.0.0.0", help="Host interface (default: 0.0.0.0)")
+    http_p.add_argument("--port", type=int, default=8000, help="Port to listen (default: 8000)")
+    http_p.add_argument("--workspace", type=str, default=None, help="Root workspace directory.")
+
     serve_p = sub.add_parser(
         "serve-stdio",
         help="Run the PatchPilot Model Context Protocol (MCP) JSON-RPC 2.0 server over stdio.",
@@ -763,6 +771,17 @@ def main(argv: list[str] | None = None) -> int:
         leaf = create_aegis_g5_leaf(rep, task_id=args.task_id)
         print(json.dumps(leaf, indent=2))
         return 0
+    if args.command == "serve-http":
+        from patchpilot.http_server import run_http_server
+        server = PatchPilotMCPServer(default_workspace=args.workspace)
+        httpd = run_http_server(server, host=args.host, port=args.port)
+        print(f"PatchPilot HTTP/SSE server running on http://{args.host}:{args.port}")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            httpd.server_close()
+        return 0
+
     if args.command == "serve-stdio":
         server = PatchPilotMCPServer(default_workspace=args.workspace)
         server.serve_stdio()
