@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 from typing import Any, TextIO
 
-from patchpilot.guard import PatchIntegrityGuard
+from patchpilot.guard import PatchIntegrityGuard, RULE_DESCRIPTIONS, RULE_SEVERITY_WEIGHTS
 from patchpilot.localizer import ASTSymbolIndex, FaultLocalizer
 from patchpilot.sandbox import TransactionalPatchWorkspace
 
@@ -191,12 +191,150 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
     },
 ]
 
+MCP_RESOURCES_SCHEMA: list[dict[str, Any]] = [
+    {
+        "uri": "patchpilot://rules/catalog",
+        "name": "AST Anti-Reward-Hacking Rule Catalog (RH001-RH008)",
+        "description": "Deterministic AST safety and anti-reward-hacking rules preventing LLM coding agents from deleting tests, adding trivial assertions, or stubbing functions.",
+        "mimeType": "application/json",
+    },
+    {
+        "uri": "patchpilot://stats/overview",
+        "name": "PatchPilot Engine Capabilities & AST Specs",
+        "description": "Overview of supported Python AST node visitors, fault localization algorithms (Stack-Trace + AST Call-Graph + BM25), and snapshot sandbox guarantees.",
+        "mimeType": "application/json",
+    },
+]
+
+MCP_PROMPTS_SCHEMA: list[dict[str, Any]] = [
+    {
+        "name": "diagnose-and-repair",
+        "description": "Localize the root-cause function from a pytest failure traceback and inspect suspect AST slices within a strict token budget.",
+        "arguments": [
+            {
+                "name": "traceback_text",
+                "description": "Raw Python traceback or pytest failure log.",
+                "required": True,
+            },
+            {
+                "name": "suspect_file",
+                "description": "Optional relative path of the file suspected to contain the bug.",
+                "required": False,
+            },
+        ],
+    },
+    {
+        "name": "audit-git-diff",
+        "description": "Audit a unified git diff against RH001-RH008 rules to ensure no test deletion, artificial pass shortcuts, or stubbed functions.",
+        "arguments": [
+            {
+                "name": "unified_diff",
+                "description": "Multi-file unified git diff string.",
+                "required": True,
+            },
+        ],
+    },
+]
+
 
 class PatchPilotMCPServer:
     """JSON-RPC 2.0 MCP Server for autonomous code repair & anti-reward-hacking verification."""
 
     def __init__(self, default_workspace: str | Path | None = None) -> None:
         self.default_workspace = Path(default_workspace).resolve() if default_workspace else None
+
+    def get_resource_definitions(self) -> list[dict[str, Any]]:
+        return list(MCP_RESOURCES_SCHEMA)
+
+    def get_prompt_definitions(self) -> list[dict[str, Any]]:
+        return list(MCP_PROMPTS_SCHEMA)
+
+    def _read_resource(self, uri: str) -> dict[str, Any]:
+        if uri == "patchpilot://rules/catalog":
+            rules_list = []
+            for code, desc in sorted(RULE_DESCRIPTIONS.items()):
+                rules_list.append({
+                    "code": code,
+                    "description": desc,
+                    "severity_weight": RULE_SEVERITY_WEIGHTS.get(code, 0.5),
+                })
+            return {
+                "contents": [
+                    {
+                        "uri": uri,
+                        "mimeType": "application/json",
+                        "text": json.dumps({"total_rules": len(rules_list), "rules": rules_list}, indent=2),
+                    }
+                ]
+            }
+        if uri == "patchpilot://stats/overview":
+            return {
+                "contents": [
+                    {
+                        "uri": uri,
+                        "mimeType": "application/json",
+                        "text": json.dumps(
+                            {
+                                "server": "patchpilot-mcp",
+                                "version": "1.1.0",
+                                "ast_anti_reward_hacking_rules": 8,
+                                "fault_localization_algorithms": ["Stack-Trace Parsing", "AST Bidirectional Call Graph", "BM25 Token Overlap"],
+                                "safety_guarantees": ["Byte-exact SHA-256 Rollback", "Anti-Reward-Hacking G5 Attestation"],
+                            },
+                            indent=2,
+                        ),
+                    }
+                ]
+            }
+        raise KeyError(f"Unknown resource URI: {uri}")
+
+    def _get_prompt(self, name: str, arguments: dict[str, Any] | None) -> dict[str, Any]:
+        args = arguments or {}
+        if name == "diagnose-and-repair":
+            tb = args.get("traceback_text", "")
+            sf = args.get("suspect_file", "Not specified")
+            return {
+                "description": "Guided root cause diagnosis and patch generation",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": {
+                            "type": "text",
+                            "text": (
+                                "You are an autonomous program repair agent.\n"
+                                f"Suspect File: {sf}\n\n"
+                                f"Failure Traceback:\n{tb}\n\n"
+                                "1. Call `localize_fault` to retrieve minimal line-numbered AST slices.\n"
+                                "2. Formulate a minimal, non-cheating patch.\n"
+                                "3. Verify with `verify_patch_integrity` to ensure RH001-RH008 compliance."
+                            ),
+                        },
+                    }
+                ],
+            }
+        if name == "audit-git-diff":
+            diff = args.get("unified_diff", "")
+            return {
+                "description": "Audit candidate git diff against RH001-RH008 anti-reward-hacking rules",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": {
+                            "type": "text",
+                            "text": (
+                                "Audit this proposed git diff for RH001-RH008 reward-hacking or test cheating:\n\n"
+                                f"```diff\n{diff}\n```\n\n"
+                                "Check:\n"
+                                "- RH001: Were test files modified without permission?\n"
+                                "- RH002: Was an assertion changed to 'assert True'?\n"
+                                "- RH003: Are functions returning dummy literals without executing logic?\n"
+                                "Provide a pass/fail verdict."
+                            ),
+                        },
+                    }
+                ],
+            }
+        raise KeyError(f"Unknown prompt: {name}")
 
     def handle_request(self, request: dict[str, Any]) -> dict[str, Any] | None:
         """Process a single JSON-RPC 2.0 request dictionary and return a response dict."""
@@ -218,6 +356,8 @@ class PatchPilotMCPServer:
                     },
                     "capabilities": {
                         "tools": {"listChanged": False},
+                        "resources": {"subscribe": False, "listChanged": False},
+                        "prompts": {"listChanged": False},
                     },
                 }
                 return self._ok(req_id, result)
@@ -227,6 +367,25 @@ class PatchPilotMCPServer:
 
             if method == "tools/list":
                 return self._ok(req_id, {"tools": MCP_TOOLS_SCHEMA})
+
+            if method == "resources/list":
+                return self._ok(req_id, {"resources": self.get_resource_definitions()})
+
+            if method == "resources/read":
+                uri = params.get("uri")
+                if not uri or not isinstance(uri, str):
+                    return self._error(req_id, -32602, "Missing 'uri' parameter.")
+                return self._ok(req_id, self._read_resource(uri))
+
+            if method == "prompts/list":
+                return self._ok(req_id, {"prompts": self.get_prompt_definitions()})
+
+            if method == "prompts/get":
+                prompt_name = params.get("name")
+                prompt_args = params.get("arguments")
+                if not prompt_name or not isinstance(prompt_name, str):
+                    return self._error(req_id, -32602, "Missing prompt 'name'.")
+                return self._ok(req_id, self._get_prompt(prompt_name, prompt_args))
 
             if method == "tools/call":
                 tool_name = params.get("name", "")

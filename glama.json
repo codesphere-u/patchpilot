@@ -23,5 +23,10 @@
     "ast-analysis",
     "anti-reward-hacking",
     "patch-verifier"
+  ],
+  "capabilities": [
+    "tools",
+    "resources",
+    "prompts"
   ]
 }

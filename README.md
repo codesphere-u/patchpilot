@@ -191,6 +191,15 @@ Feed a raw stack trace to get exact line-numbered AST function slices within an 
 }
 ```
 
+### Exposed MCP Resources & Prompts
+
+- **Resources (`resources/list`, `resources/read`)**:
+  - `patchpilot://rules/catalog`: The 8 AST anti-reward-hacking rules (`RH001`–`RH008`) with rule descriptions, severity weights, and AST patterns.
+  - `patchpilot://stats/overview`: Overview of supported Python AST node visitors, fault localization algorithms, and snapshot sandbox specs.
+- **Prompts (`prompts/list`, `prompts/get`)**:
+  - `diagnose-and-repair`: Step-by-step guided prompt to localize root cause from a pytest failure traceback and inspect suspect AST slices.
+  - `audit-git-diff`: Structured prompt for code reviewers to audit unified diffs for reward-hacking anti-patterns.
+
 ### MCP Client Configuration (`claude_desktop_config.json` / `.cursor/mcp.json`)
 
 ```json
