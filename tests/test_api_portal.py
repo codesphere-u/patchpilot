@@ -24,7 +24,7 @@ def test_portal_html_render():
         tools=[{"name": "audit_unified_diff", "description": "Audit diff", "inputSchema": {"properties": {"diff_text": {"type": "string"}}, "required": ["diff_text"]}}],
         resources=[{"uri": "patchpilot://rules/catalog", "name": "Rules Catalog", "mimeType": "application/json", "description": "Anti-reward-hacking rules"}],
         prompts=[{"name": "diagnose-and-repair", "description": "Diagnose traceback", "arguments": [{"name": "traceback_text", "required": True}]}],
-        sample_tool_call={"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "audit_unified_diff", "arguments": {"diff_text": ""}}},
+        sample_tool_call={"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "audit_unified_diff", "arguments": {"unified_diff": ""}}},
     )
     assert "<!DOCTYPE html>" in html
     assert "patchpilot" in html

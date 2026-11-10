@@ -186,7 +186,7 @@ async def health_check(request: Request):
             tools=tools,
             resources=resources,
             prompts=prompts,
-            sample_tool_call={"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": {"name": "audit_unified_diff", "arguments": {"diff_text": "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-def f(): pass\n+def f(): return True"}}},
+            sample_tool_call={"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": {"name": "audit_unified_diff", "arguments": {"unified_diff": "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-def f(): pass\n+def f(): return True"}}},
         )
         return HTMLResponse(content=html_content)
 
