@@ -10,10 +10,12 @@
   "url": "https://patchpilot-eta.vercel.app/mcp",
   "endpoints": {
     "streamable_http": "https://patchpilot-eta.vercel.app/mcp",
+    "sse": "https://patchpilot-eta.vercel.app/sse",
     "health": "https://patchpilot-eta.vercel.app/health"
   },
   "transport": [
     "streamable-http",
+    "sse",
     "stdio"
   ],
   "keywords": [

@@ -1,12 +1,20 @@
 # `patchpilot` — Autonomous Code Repair Engine
 
 [![CI](https://github.com/codesphere-u/patchpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/patchpilot/actions/workflows/ci.yml)
+[![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/codesphere-u/patchpilot/releases/tag/v1.1.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![MCP Compatible](https://img.shields.io/badge/MCP-JSON--RPC%202.0-00b4d8.svg)](https://modelcontextprotocol.io/)
+[![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://patchpilot-eta.vercel.app/mcp)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
+[![Glama Gateway](https://img.shields.io/badge/Glama-Verified-38bdf8)](https://glama.ai/mcp)
+[![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
+[![Tests Passed](https://img.shields.io/badge/tests-80%20passed-brightgreen.svg)](tests/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero%20runtime-success.svg)](#installation)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Stack-Trace & AST Call-Graph Fault Localizer, Deterministic Anti-Reward-Hacking Patch Verifier (`RH001`–`RH008`), Transactional Rollback Sandbox, and Model Context Protocol (MCP) Server for Autonomous Coding Agents.**
+
+> 🚀 **Live Interactive Developer Portal & Playground:** Visit [`https://patchpilot-eta.vercel.app`](https://patchpilot-eta.vercel.app) in your web browser to test diff auditing live, inspect schemas, and copy 1-click configurations for Claude Code, Cursor, Windsurf, and Claude Desktop.
 
 ---
 
@@ -191,14 +199,19 @@ Feed a raw stack trace to get exact line-numbered AST function slices within an 
 }
 ```
 
-### Exposed MCP Resources & Prompts
+### Exposed MCP Resources (`resources/list`, `resources/read`)
 
-- **Resources (`resources/list`, `resources/read`)**:
-  - `patchpilot://rules/catalog`: The 8 AST anti-reward-hacking rules (`RH001`–`RH008`) with rule descriptions, severity weights, and AST patterns.
-  - `patchpilot://stats/overview`: Overview of supported Python AST node visitors, fault localization algorithms, and snapshot sandbox specs.
-- **Prompts (`prompts/list`, `prompts/get`)**:
-  - `diagnose-and-repair`: Step-by-step guided prompt to localize root cause from a pytest failure traceback and inspect suspect AST slices.
-  - `audit-git-diff`: Structured prompt for code reviewers to audit unified diffs for reward-hacking anti-patterns.
+| Resource URI | MIME Type | Purpose / Content Description |
+| :--- | :--- | :--- |
+| `patchpilot://rules/catalog` | `application/json` | The complete 8 AST anti-reward-hacking rules (`RH001`–`RH008`) detailing AST patterns, severities, and remediation guidelines. |
+| `patchpilot://stats/overview` | `application/json` | Overview of supported Python AST node visitors, fault localization algorithms, and snapshot sandbox specs. |
+
+### Exposed MCP Prompts (`prompts/list`, `prompts/get`)
+
+| Prompt Name | Purpose / Use Case | Required Arguments | Workflow Output |
+| :--- | :--- | :--- | :--- |
+| `diagnose-and-repair` | Guides an LLM agent to analyze a pytest failure traceback and systematically inspect suspect AST slices. | `traceback_text` (string) | Pre-formatted diagnostic prompt breaking down the exception frame, suspect functions, and verification constraints. |
+| `audit-git-diff` | Guides an LLM reviewer to audit a candidate unified git diff for reward-hacking anti-patterns (`RH001`–`RH008`). | `diff_text` (string) | Pre-formatted code review prompt checking for deleted assertions, weakened tests, or swallowed exceptions. |
 
 ### MCP Client Configuration (`claude_desktop_config.json` / `.cursor/mcp.json`)
 
@@ -239,7 +252,7 @@ curl -s -X POST https://patchpilot-eta.vercel.app/mcp -H 'Content-Type: applicat
 
 ### Client Configuration
 
-#### 1. Claude Code CLI
+#### 1. Claude Code CLI (Recommended)
 ```bash
 # Add to current project:
 claude mcp add --transport http patchpilot https://patchpilot-eta.vercel.app/mcp
@@ -255,6 +268,28 @@ claude mcp add --scope user --transport http patchpilot https://patchpilot-eta.v
     "patchpilot": {
       "type": "http",
       "url": "https://patchpilot-eta.vercel.app/mcp"
+    }
+  }
+}
+```
+
+#### 3. Smithery Registry (1-Click Install)
+```bash
+npx -y @smithery/cli install @codesphere-u/patchpilot --client claude
+```
+
+#### 4. Local Stdio via `uvx` (Full Workspace Access & File Mutations)
+```json
+{
+  "mcpServers": {
+    "patchpilot": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/codesphere-u/patchpilot.git",
+        "patchpilot",
+        "serve-stdio"
+      ]
     }
   }
 }

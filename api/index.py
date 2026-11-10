@@ -29,9 +29,13 @@ for _p in (str(SRC_DIR), str(ROOT_DIR)):
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from patchpilot.server import PatchPilotMCPServer
+try:
+    from portal import render_developer_portal
+except ImportError:
+    from api.portal import render_developer_portal
 
 SERVER_NAME = "patchpilot"
 SERVER_VERSION = "1.1.0"
@@ -165,13 +169,33 @@ def _dispatch(message: Any) -> Optional[Dict[str, Any]]:
 
 @app.get("/")
 @app.get("/health")
-async def health_check():
+@app.get("/healthz")
+@app.get("/api/health")
+async def health_check(request: Request):
+    accept = request.headers.get("accept", "")
+    if "text/html" in accept:
+        tools = _sanitize_tools(mcp_engine.handle_request({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}).get("result", {}).get("tools", []))
+        resources = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 2, "method": "resources/list"}).get("result", {}).get("resources", [])
+        prompts = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 3, "method": "prompts/list"}).get("result", {}).get("prompts", [])
+        html_content = render_developer_portal(
+            server_name=SERVER_NAME,
+            server_version=SERVER_VERSION,
+            tagline="Autonomous Code Repair Engine & Anti-Reward-Hacking Verifier",
+            endpoint_url=f"{str(request.base_url).rstrip('/')}/mcp",
+            github_url="https://github.com/codesphere-u/patchpilot",
+            tools=tools,
+            resources=resources,
+            prompts=prompts,
+            sample_tool_call={"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": {"name": "audit_unified_diff", "arguments": {"diff_text": "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-def f(): pass\n+def f(): return True"}}},
+        )
+        return HTMLResponse(content=html_content)
+
     return {
         "status": "healthy",
         "server": SERVER_NAME,
         "version": SERVER_VERSION,
         "protocol": "mcp-jsonrpc-2.0",
-        "transport": ["streamable-http"],
+        "transport": ["streamable-http", "sse"],
         "endpoint": "/mcp",
         "runtime": "vercel-serverless",
         "hosted_restrictions": sorted(HOSTED_BLOCKED_TOOLS),
@@ -179,9 +203,13 @@ async def health_check():
 
 
 @app.get("/mcp")
-async def mcp_get():
-    # Streamable HTTP: server-initiated streams are optional; this gateway is stateless.
-    return Response(status_code=405, headers={"Allow": "POST, OPTIONS"})
+async def mcp_get(request: Request):
+    accept = request.headers.get("accept", "")
+    if "text/event-stream" in accept:
+        return await sse_legacy(request)
+    if "text/html" in accept:
+        return await health_check(request)
+    return await health_check(request)
 
 
 @app.get("/sse")
