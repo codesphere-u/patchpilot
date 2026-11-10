@@ -4,9 +4,15 @@
     "codesphere-u"
   ],
   "name": "patchpilot",
-  "description": "Self-Healing Automated Test Failure Repair & Code Refactoring MCP Server with AST Anti-Reward-Hacking Guardrails.",
+  "description": "Autonomous code repair engine with stack-trace fault localization, AST anti-reward-hacking verification, and transactional patch sandbox.",
   "type": "mcp_server",
   "status": "production",
+  "url": "https://patchpilot-eta.vercel.app/sse",
+  "endpoints": {
+    "sse": "https://patchpilot-eta.vercel.app/sse",
+    "http": "https://patchpilot-eta.vercel.app/messages",
+    "health": "https://patchpilot-eta.vercel.app/health"
+  },
   "transport": [
     "http",
     "sse",
@@ -14,10 +20,10 @@
   ],
   "keywords": [
     "mcp",
-    "model-context-protocol",
-    "self-healing-code",
-    "automated-refactoring",
+    "ai-agents",
+    "code-repair",
     "ast-analysis",
-    "developer-tools"
+    "anti-reward-hacking",
+    "patch-verifier"
   ]
 }
