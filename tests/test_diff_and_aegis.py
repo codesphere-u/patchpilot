@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
-import pytest
 
 from patchpilot.aegis_bridge import (
     canonical_json_bytes,
@@ -17,9 +15,7 @@ from patchpilot.diff_parser import (
     parse_unified_diff,
     reconstruct_file_pairs_from_diff,
 )
-from patchpilot.guard import PatchIntegrityGuard
 from patchpilot.server import PatchPilotMCPServer
-
 
 SAMPLE_CLEAN_DIFF = """\
 diff --git a/src/math_lib.py b/src/math_lib.py

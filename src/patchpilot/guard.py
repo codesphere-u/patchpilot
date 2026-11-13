@@ -14,7 +14,7 @@ import fnmatch
 import hashlib
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 RULE_DESCRIPTIONS: dict[str, str] = {
@@ -224,9 +224,7 @@ def apply_unified_diff_to_map(
         if current_path is not None:
             patched_lines.extend(orig_lines[orig_pos:])
             joined = "\n".join(patched_lines)
-            if orig_lines and original_files.get(current_path, "").endswith("\n"):
-                joined += "\n"
-            elif not orig_lines and patched_lines:
+            if orig_lines and original_files.get(current_path, "").endswith("\n") or not orig_lines and patched_lines:
                 joined += "\n"
             result[current_path] = joined
         current_path = None
@@ -241,8 +239,7 @@ def apply_unified_diff_to_map(
             idx += 1
             if idx < len(lines) and lines[idx].startswith("+++ "):
                 raw_target = lines[idx][4:].strip().split("\t")[0]
-                if raw_target.startswith("b/"):
-                    raw_target = raw_target[2:]
+                raw_target = raw_target.removeprefix("b/")
                 current_path = raw_target
                 orig_text = original_files.get(current_path, "")
                 orig_lines = orig_text.splitlines()
@@ -261,7 +258,7 @@ def apply_unified_diff_to_map(
             idx += 1
             while idx < len(lines):
                 hline = lines[idx]
-                if hline.startswith("--- ") or hline.startswith("@@ ") or hline.startswith("diff --git"):
+                if hline.startswith(("--- ", "@@ ", "diff --git")):
                     break
                 if hline.startswith("\\ No newline at end of file"):
                     idx += 1
@@ -300,9 +297,12 @@ def _is_tautology_expr(expr: ast.AST) -> bool:
     """Return True if an `assert <expr>` test expression is a constant truthy tautology."""
     if isinstance(expr, ast.Constant):
         return bool(expr.value) is True
-    if isinstance(expr, ast.UnaryOp) and isinstance(expr.op, ast.Not):
-        if isinstance(expr.operand, ast.Constant):
-            return bool(expr.operand.value) is False
+    if (
+        isinstance(expr, ast.UnaryOp)
+        and isinstance(expr.op, ast.Not)
+        and isinstance(expr.operand, ast.Constant)
+    ):
+        return bool(expr.operand.value) is False
     if isinstance(expr, ast.Compare) and len(expr.ops) == 1 and len(expr.comparators) == 1:
         left = expr.left
         right = expr.comparators[0]
@@ -314,10 +314,14 @@ def _is_tautology_expr(expr: ast.AST) -> bool:
                 return True
         if isinstance(op, (ast.Eq, ast.Is)) and ast.dump(left) == ast.dump(right):
             return True
-    if isinstance(expr, ast.Call) and isinstance(expr.func, ast.Name) and expr.func.id == "bool":
-        if expr.args and isinstance(expr.args[0], ast.Constant) and bool(expr.args[0].value) is True:
-            return True
-    return False
+    return (
+        isinstance(expr, ast.Call)
+        and isinstance(expr.func, ast.Name)
+        and expr.func.id == "bool"
+        and bool(expr.args)
+        and isinstance(expr.args[0], ast.Constant)
+        and bool(expr.args[0].value) is True
+    )
 
 
 def _count_assertions_in_node(node: ast.AST) -> tuple[int, list[tuple[int, str]]]:
@@ -331,8 +335,9 @@ def _count_assertions_in_node(node: ast.AST) -> tuple[int, list[tuple[int, str]]
                 tautologies.append((getattr(child, "lineno", 1), ast.unparse(child)))
         elif isinstance(child, ast.Call):
             func = child.func
-            if isinstance(func, ast.Attribute):
-                if func.attr.startswith("assert") or func.attr == "raises":
+            if isinstance(func, ast.Attribute) and (
+                func.attr.startswith("assert") or func.attr == "raises"
+            ):
                     count += 1
                     if func.attr in ("assertTrue", "assert_"):
                         if child.args and _is_tautology_expr(child.args[0]):
@@ -370,9 +375,7 @@ def _find_skip_calls(node: ast.AST) -> list[tuple[int, str]]:
     for child in ast.walk(node):
         if isinstance(child, ast.Call):
             func = child.func
-            if isinstance(func, ast.Attribute) and func.attr in _SKIP_CALL_NAMES:
-                calls.append((getattr(child, "lineno", 1), ast.unparse(child)))
-            elif isinstance(func, ast.Name) and func.id in _SKIP_CALL_NAMES:
+            if isinstance(func, ast.Attribute) and func.attr in _SKIP_CALL_NAMES or isinstance(func, ast.Name) and func.id in _SKIP_CALL_NAMES:
                 calls.append((getattr(child, "lineno", 1), ast.unparse(child)))
     return calls
 
@@ -380,9 +383,7 @@ def _find_skip_calls(node: ast.AST) -> list[tuple[int, str]]:
 def _is_swallowing_handler(handler: ast.ExceptHandler) -> tuple[bool, str]:
     """Detect `except:` or `except Exception:` blocks that merely swallow errors."""
     is_broad = False
-    if handler.type is None:
-        is_broad = True
-    elif isinstance(handler.type, ast.Name) and handler.type.id in _BROAD_EXCEPTION_NAMES:
+    if handler.type is None or isinstance(handler.type, ast.Name) and handler.type.id in _BROAD_EXCEPTION_NAMES:
         is_broad = True
     elif isinstance(handler.type, ast.Tuple):
         for elt in handler.type.elts:
@@ -410,8 +411,9 @@ def _is_swallowing_handler(handler: ast.ExceptHandler) -> tuple[bool, str]:
             return True, "except ...: continue"
         if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and stmt.value.value is Ellipsis:
             return True, "except ...: ..."
-        if isinstance(stmt, ast.Return):
-            if stmt.value is None or isinstance(stmt.value, (ast.Constant, ast.List, ast.Dict, ast.Tuple)):
+        if isinstance(stmt, ast.Return) and (
+            stmt.value is None or isinstance(stmt.value, (ast.Constant, ast.List, ast.Dict, ast.Tuple))
+        ):
                 return True, f"except ...: {ast.unparse(stmt)}"
 
     return False, ""
@@ -647,7 +649,7 @@ class PatchIntegrityGuard:
                             )
 
                 # Check newly introduced pytest.skip / pytest.xfail / self.skipTest calls
-                before_skips = set(s for _, s in (_find_skip_calls(before_tree) if before_tree else []))
+                before_skips = {s for _, s in (_find_skip_calls(before_tree) if before_tree else [])}
                 for lineno, call_src in _find_skip_calls(after_tree):
                     if call_src not in before_skips:
                         violations.append(
@@ -741,9 +743,9 @@ class PatchIntegrityGuard:
                     )
 
             # RH005: Forbidden dangerous primitives (newly introduced)
-            before_danger = set(
+            before_danger = {
                 s for _, s in (_collect_dangerous_primitives(before_tree) if before_tree else [])
-            )
+            }
             for lineno, prim_src in _collect_dangerous_primitives(after_tree):
                 if prim_src not in before_danger:
                     violations.append(
@@ -759,9 +761,9 @@ class PatchIntegrityGuard:
                     )
 
             # RH006: Debug breakpoints / pdb leftovers (newly introduced)
-            before_debug = set(
+            before_debug = {
                 s for _, s in (_collect_debug_leftovers(before_tree) if before_tree else [])
-            )
+            }
             for lineno, dbg_src in _collect_debug_leftovers(after_tree):
                 if dbg_src not in before_debug:
                     violations.append(

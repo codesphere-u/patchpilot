@@ -1,20 +1,22 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-# Copy packaging metadata, license, and source code
-COPY pyproject.toml README.md LICENSE ./
-COPY src/ ./src/
+COPY pyproject.toml README.md ./
+COPY src ./src
 
-# Install package in production mode
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir . \
+    && useradd --create-home --uid 10001 --shell /usr/sbin/nologin appuser \
+    && chown -R appuser:appuser /app
 
-# Configuration for remote cloud hosting (Glama.ai, Fly.io, Docker)
-ENV HOST=0.0.0.0
-ENV PORT=8000
+USER appuser
 
-EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python -c "import patchpilot, patchpilot.cli; print('ok')" || exit 1
 
-# Default entrypoint and command for Glama container test & local stdio pipes
 ENTRYPOINT ["patchpilot"]
 CMD ["serve-stdio"]

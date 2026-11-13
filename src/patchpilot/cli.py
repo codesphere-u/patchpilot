@@ -123,13 +123,10 @@ def run_demo(*, as_json: bool = False) -> dict[str, Any]:
         }
 
         def _verify_fix(ws: Path) -> VerificationOutcome:
-            ns: dict[str, Any] = {}
-            pricing_code = (ws / "billing/pricing.py").read_text(encoding="utf-8")
-            tax_code = (ws / "billing/tax.py").read_text(encoding="utf-8")
-            exec(pricing_code, ns)
-            exec(tax_code, ns)
-            discounted = ns["apply_volume_discount"](1000, 10)
-            total = discounted + ns["compute_regional_tax"](discounted, "DEFAULT")
+            pricing_ns = __import__("runpy").run_path(str(ws / "billing/pricing.py"))
+            tax_ns = __import__("runpy").run_path(str(ws / "billing/tax.py"), init_globals=pricing_ns)
+            discounted = pricing_ns["apply_volume_discount"](1000, 10)
+            total = discounted + tax_ns["compute_regional_tax"](discounted, "DEFAULT")
             passed = total == 8925
             return VerificationOutcome(
                 passed=passed,

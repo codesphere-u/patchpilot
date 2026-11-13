@@ -16,9 +16,6 @@ from patchpilot.guard import (
     DiffStats,
     GuardViolation,
     PatchIntegrityGuard,
-    PatchVerdict,
-    apply_unified_diff_to_map,
-    build_unified_diff,
 )
 
 _DIFF_HEADER_RE = re.compile(r"^diff --git a/(.+?) b/(.+?)$", re.MULTILINE)
@@ -139,9 +136,8 @@ def parse_unified_diff(diff_text: str) -> ParsedDiff:
             current_hunk_meta = (old_s, old_c, new_s, new_c, heading)
             continue
 
-        if current_hunk_meta is not None:
-            if line.startswith(("+", "-", " ", "\\")):
-                current_hunk_lines.append(line)
+        if current_hunk_meta is not None and line.startswith(("+", "-", " ", "\\")):
+            current_hunk_lines.append(line)
 
     _flush_hunk()
     return ParsedDiff(files=file_diffs, raw_diff=diff_text)
@@ -227,7 +223,7 @@ def audit_unified_diff(
             violations=verdict.violations,
             diff_stats=verdict.diff_stats,
             sha256_diff_id=verdict.sha256_patch_id,
-            file_paths=verdict.diff_stats.touched_paths,
+            file_paths=list(verdict.diff_stats.touched_paths),
             raw_diff=diff_text,
         )
 

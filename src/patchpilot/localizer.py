@@ -462,7 +462,7 @@ class ASTSymbolIndex:
                 rel = Path(file_path).resolve().relative_to(self.workspace_root).as_posix()
                 if rel in self._by_file:
                     return rel
-            except Exception:
+            except (ValueError, OSError):
                 pass
         # Suffix match fallback
         for indexed_path in self._by_file:

@@ -14,10 +14,11 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from patchpilot.guard import (
     PatchIntegrityGuard,
@@ -264,7 +265,7 @@ class TransactionalPatchWorkspace:
 
             if verification_outcome.passed:
                 committed = True
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - rollback transactional patch on any verifier error
             verification_outcome = VerificationOutcome(
                 passed=False,
                 exit_code=1,

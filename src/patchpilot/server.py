@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 from typing import Any, TextIO
 
-from patchpilot.guard import PatchIntegrityGuard, RULE_DESCRIPTIONS, RULE_SEVERITY_WEIGHTS
+from patchpilot.guard import RULE_DESCRIPTIONS, RULE_SEVERITY_WEIGHTS, PatchIntegrityGuard
 from patchpilot.localizer import ASTSymbolIndex, FaultLocalizer
 from patchpilot.sandbox import TransactionalPatchWorkspace
 
@@ -410,7 +410,7 @@ class PatchPilotMCPServer:
             return self._error(req_id, -32602, f"Missing required parameter: {exc}")
         except ValueError as exc:
             return self._error(req_id, -32602, str(exc))
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - top-level JSON-RPC dispatch boundary
             return self._error(req_id, -32603, f"Internal error: {exc}")
 
     def _dispatch_tool(self, tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
@@ -421,10 +421,10 @@ class PatchPilotMCPServer:
             diff_text = args["unified_diff"]
             original_files = args.get("original_files")
             report = audit_unified_diff(diff_text, original_files=original_files)
-            res = report.to_dict()
+            audit_out = report.to_dict()
             if args.get("export_aegis", False):
-                res["aegis_g5_leaf"] = create_aegis_g5_leaf(report)
-            return res
+                audit_out["aegis_g5_leaf"] = create_aegis_g5_leaf(report)
+            return audit_out
 
         if tool_name == "localize_fault":
             traceback_text = args["traceback_text"]
@@ -436,14 +436,14 @@ class PatchPilotMCPServer:
                 localizer = FaultLocalizer.from_directory(workspace_root)
             else:
                 raise ValueError("Provide either 'workspace_root' or 'sources'.")
-            res = localizer.localize(
+            loc_res = localizer.localize(
                 traceback_text,
                 top_k=int(args.get("top_k", 5)),
                 token_budget=int(args.get("token_budget", 1200)),
                 include_tests=bool(args.get("include_tests", False)),
             )
-            out = res.to_dict()
-            out["formatted_prompt"] = res.format_context_prompt()
+            out = loc_res.to_dict()
+            out["formatted_prompt"] = loc_res.format_context_prompt()
             return out
 
         if tool_name == "verify_patch_integrity":

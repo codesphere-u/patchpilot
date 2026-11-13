@@ -8,10 +8,10 @@ on platforms such as Glama.ai, Fly.io, Cloudflare, and Docker containers.
 from __future__ import annotations
 
 import json
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import logging
-from typing import TYPE_CHECKING
 import uuid
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from patchpilot.server import PatchPilotMCPServer
@@ -59,7 +59,7 @@ class PatchPilotHTTPHandler(BaseHTTPRequestHandler):
             self._send_cors_headers()
             self.end_headers()
 
-            endpoint_msg = f"event: endpoint\ndata: /messages?session_id={session_id}\n\n".encode("utf-8")
+            endpoint_msg = f"event: endpoint\ndata: /messages?session_id={session_id}\n\n".encode()
             self.wfile.write(endpoint_msg)
             self.wfile.flush()
             return
@@ -76,7 +76,7 @@ class PatchPilotHTTPHandler(BaseHTTPRequestHandler):
         try:
             raw_data = self.rfile.read(content_length).decode("utf-8")
             payload = json.loads(raw_data)
-        except Exception as e:
+        except (OSError, UnicodeDecodeError, ValueError) as e:
             self._send_error(400, f"Malformed JSON: {e}")
             return
 

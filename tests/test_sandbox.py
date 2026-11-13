@@ -44,10 +44,9 @@ def test_transactional_commit_on_valid_patch_and_passing_verifier(tmp_path: Path
     }
 
     def _verifier(ws: Path) -> VerificationOutcome:
-        ns: dict[str, object] = {}
-        exec((ws / "pkg" / "converter.py").read_text(encoding="utf-8"), ns)
+        ns = __import__("runpy").run_path(str(ws / "pkg" / "converter.py"))
         fn = ns["celsius_to_fahrenheit"]
-        passed = fn(100.0) == 212.0  # type: ignore[operator]
+        passed = fn(100.0) == 212.0
         return VerificationOutcome(passed=passed, exit_code=0 if passed else 1, output="ok")
 
     receipt = sandbox.apply_patch_transaction(
