@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PatchPilot Documentation — CLI, Python SDK, Sandbox &amp; MCP Server</title>
+  <meta name="description" content="Complete PatchPilot v1.2.0 docs covering CLI commands, RH001-RH008 AST guard, FaultLocalizer SDK, SHA-256 sandbox, and Vercel MCP." />
+  <link rel="canonical" href="https://codesphere-u.github.io/patchpilot/docs.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="PatchPilot Documentation" />
+  <meta property="og:description" content="Getting started, AST guard rules, fault localization SDK, SHA-256 receipts, and hosted MCP server." />
+  <meta property="og:url" content="https://codesphere-u.github.io/patchpilot/docs.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/patchpilot/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "PatchPilot v1.2.0 Documentation",
+    "description": "Guides for installing PatchPilot, running CI diff audits, integrating FaultLocalizer and TransactionalPatchWorkspace, and connecting MCP clients.",
+    "url": "https://codesphere-u.github.io/patchpilot/docs.html",
+    "author": {
+      "@type": "Person",
+      "name": "Akandwanaho Ivan Alvin"
+    }
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col page-col-docs">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="PatchPilot Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="PatchPilot">
+          <g fill="#f97316" stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="26" height="26" rx="7" fill="#ffedd5"/>
+            <rect x="7" y="11" width="16" height="10" rx="4" fill="#1e1b18"/>
+            <circle cx="12" cy="16" r="2.2" fill="#10b981" stroke="none"/>
+            <circle cx="18" cy="16" r="2.2" fill="#f97316" stroke="none"/>
+          </g>
+          <text x="36" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.6">PatchPilot</text>
+          <circle cx="151" cy="10" r="3" fill="#10b981" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html" class="active">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/patchpilot" aria-label="PatchPilot GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="docs-mobile-nav" role="tablist" aria-label="Documentation Sections">
+        <button type="button" class="docs-mobile-chip active" data-doc-target="install-cli">Install &amp; CLI</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="guard-rules">AST Guard</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="fault-localizer">Fault Localizer</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="sandbox-receipts">SHA-256 Sandbox</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="mcp-vercel">MCP &amp; Vercel</button>
+      </div>
+
+      <div class="docs-layout">
+        <aside class="docs-sidebar" aria-label="Documentation Navigation">
+          <ul class="docs-rail">
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link active" data-doc-target="install-cli">Install &amp; CLI</button>
+              <ul class="doc-subrail open" data-subrail-for="install-cli">
+                <li><a class="doc-sub-link active" href="#sec-install-methods">Install Options</a></li>
+                <li><a class="doc-sub-link" href="#sec-cli-commands">CLI Subcommands</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="guard-rules">AST Guard (RH001–RH008)</button>
+              <ul class="doc-subrail" data-subrail-for="guard-rules">
+                <li><a class="doc-sub-link" href="#sec-rule-weights">Rule Severities</a></li>
+                <li><a class="doc-sub-link" href="#sec-diff-audit">Diff Audit &amp; Aegis</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="fault-localizer">Fault Localizer SDK</button>
+              <ul class="doc-subrail" data-subrail-for="fault-localizer">
+                <li><a class="doc-sub-link" href="#sec-hybrid-ranking">Hybrid Ranking</a></li>
+                <li><a class="doc-sub-link" href="#sec-budget-packing">Token Budget Packing</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="sandbox-receipts">SHA-256 Sandbox</button>
+              <ul class="doc-subrail" data-subrail-for="sandbox-receipts">
+                <li><a class="doc-sub-link" href="#sec-atomic-tx">Atomic Transactions</a></li>
+                <li><a class="doc-sub-link" href="#sec-repair-receipt">RepairReceipt Schema</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="mcp-vercel">MCP &amp; Vercel</button>
+              <ul class="doc-subrail" data-subrail-for="mcp-vercel">
+                <li><a class="doc-sub-link" href="#sec-stdio-http">Stdio &amp; HTTP/SSE</a></li>
+                <li><a class="doc-sub-link" href="#sec-hosted-guardrails">Hosted Guardrails</a></li>
+              </ul>
+            </li>
+          </ul>
+        </aside>
+
+        <article class="doc-content">
+          <section data-doc-panel="install-cli">
+            <h1>Install &amp; CLI</h1>
+            <p>PatchPilot keeps its AST localizer, anti-reward-hacking guard, snapshot sandbox, and JSON-RPC 2.0 stdio server in pure Python standard library modules, with FastAPI/Uvicorn wired in <code>pyproject.toml</code> for the Streamable HTTP gateway.</p>
+
+            <h2 id="sec-install-methods">Install Options</h2>
+            <div class="handy-card">
+              <div class="handy-tabs-bar">
+                <div class="handy-tabs" role="tablist">
+                  <button type="button" class="handy-tab active" data-install-tab="pip">Editable Pip</button>
+                  <button type="button" class="handy-tab" data-install-tab="uv">uv / uvx</button>
+                  <button type="button" class="handy-tab" data-install-tab="mcp">Hosted MCP</button>
+                </div>
+                <span class="version-tag">v1.2.0</span>
+              </div>
+              <div class="doc-codeblock" style="margin:0;">
+                <pre id="docs-install-pre"><span class="syn-cmd">git clone</span> <span class="syn-arg">https://github.com/codesphere-u/patchpilot.git</span>
+cd patchpilot &amp;&amp; pip install -e ".[dev]"</pre>
+                <button type="button" class="copy-icon-btn" data-copy-target="docs-install-pre" aria-label="Copy install command">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <h2 id="sec-cli-commands">CLI Subcommands</h2>
+            <div class="doc-table-wrap">
+              <table class="doc-table">
+                <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>patchpilot demo [--json]</code></td><td>Creates a billing bug workspace, ranks 3 AST slices in 303 tokens, blocks an adversarial patch, and commits the clean fix.</td></tr>
+                  <tr><td><code>patchpilot benchmark [--json]</code></td><td>Runs the 50-file AST indexer, 25-scenario localizer, and 40-patch guard benchmark.</td></tr>
+                  <tr><td><code>patchpilot audit-diff [file] [--json]</code></td><td>Audits unified diff input from a path or stdin against <code>RH001</code>–<code>RH008</code>; exits 1 on violation.</td></tr>
+                  <tr><td><code>patchpilot export-aegis [file] --task-id ID</code></td><td>Emits canonical Nexus Aegis <code>G5_ANTI_REWARD_HACK</code> attestation with RFC 6962 <code>0x00</code> leaf hash.</td></tr>
+                  <tr><td><code>patchpilot serve-stdio / mcp</code></td><td>Runs the JSON-RPC 2.0 stdio MCP server with optional <code>--workspace</code> path.</td></tr>
+                  <tr><td><code>patchpilot serve-http --host 127.0.0.1 --port 8000</code></td><td>Runs the local HTTP/SSE MCP server and developer portal.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section data-doc-panel="guard-rules" hidden>
+            <h1>AST Guard (RH001–RH008)</h1>
+            <p><code>PatchIntegrityGuard</code> walks original and candidate Python ASTs side by side to detect test tampering, weakened assertions, swallowed exceptions, syntax failures, unsafe primitives, and protected config changes.</p>
+
+            <h2 id="sec-rule-weights">Rule Severities &amp; Defaults</h2>
+            <p>Protected patterns by default include <code>.github/*</code>, <code>pyproject.toml</code>, <code>setup.py</code>, <code>poetry.lock</code>, <code>uv.lock</code>, <code>requirements*.txt</code>, <code>.env*</code>, and <code>conftest.py</code>. Blast radius defaults to <code>max_files_touched=5</code> and <code>max_lines_changed=250</code>.</p>
+            <div class="doc-codeblock">
+              <pre id="docs-guard-pre">from patchpilot import PatchIntegrityGuard
+
+guard = PatchIntegrityGuard()
+verdict = guard.verify_patch(
+    original_files={"tests/test_app.py": orig_test, "app.py": orig_app},
+    patched_files={"tests/test_app.py": cheated_test, "app.py": fixed_app},
+)
+assert not verdict.approved</pre>
+              <button type="button" class="copy-icon-btn" data-copy-target="docs-guard-pre" aria-label="Copy guard example">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+
+            <h2 id="sec-diff-audit">Diff Audit &amp; Nexus Aegis Export</h2>
+            <p>Even without full repository files on disk, <code>patchpilot.diff_parser.audit_unified_diff</code> reconstructs added/removed hunks and checks every modified file in a PR or agent diff.</p>
+          </section>
+
+          <section data-doc-panel="fault-localizer" hidden>
+            <h1>Fault Localizer SDK</h1>
+            <p>Rather than dumping entire source trees into agent prompts, <code>FaultLocalizer</code> indexes AST functions, classes, and bidirectional call edges and selects only high-signal slices fitting your token budget.</p>
+
+            <h2 id="sec-hybrid-ranking">Hybrid Ranking Signals</h2>
+            <ul>
+              <li><strong>Traceback Frames</strong>: Extracts standard Python tracebacks and pytest short failure traces.</li>
+              <li><strong>Bidirectional Call-Graph</strong>: Walks 1-hop callers and callees from crashing frames so root causes in helper functions rank alongside crash sites.</li>
+              <li><strong>BM25 Lexical Spectrum</strong>: Matches camelCase and snake_case identifiers from error messages and assertion lines.</li>
+            </ul>
+
+            <h2 id="sec-budget-packing">Token Budget Packing</h2>
+            <div class="doc-codeblock">
+              <pre id="docs-loc-pre">from pathlib import Path
+from patchpilot import FaultLocalizer
+
+localizer = FaultLocalizer.from_directory(Path("./repo"))
+result = localizer.localize(pytest_stderr, top_k=3, token_budget=600)
+print(result.format_context_prompt())</pre>
+              <button type="button" class="copy-icon-btn" data-copy-target="docs-loc-pre" aria-label="Copy localizer code">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </section>
+
+          <section data-doc-panel="sandbox-receipts" hidden>
+            <h1>SHA-256 Sandbox</h1>
+            <p><code>TransactionalPatchWorkspace</code> guarantees that failed agent patches never leave half-edited files or broken state behind on disk.</p>
+
+            <h2 id="sec-atomic-tx">Atomic Transactions</h2>
+            <p>Before writing any byte, the sandbox records pre-state SHA-256 digests of targeted files. It evaluates <code>PatchIntegrityGuard</code> first, writes approved edits, runs your verification callback or test command, and rolls back byte-for-byte on non-zero exit or guard rejection.</p>
+
+            <h2 id="sec-repair-receipt">RepairReceipt Schema</h2>
+            <div class="doc-codeblock">
+              <pre id="docs-tx-pre">from patchpilot import PatchIntegrityGuard, TransactionalPatchWorkspace
+
+sandbox = TransactionalPatchWorkspace("./repo", guard=PatchIntegrityGuard())
+receipt = sandbox.apply_patch_transaction(
+    patched_files={"billing/pricing.py": new_source},
+    test_command=["pytest", "-q"],
+)
+print(receipt.status, receipt.receipt_sha256)</pre>
+              <button type="button" class="copy-icon-btn" data-copy-target="docs-tx-pre" aria-label="Copy sandbox code">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </section>
+
+          <section data-doc-panel="mcp-vercel" hidden>
+            <h1>MCP &amp; Vercel Gateway</h1>
+            <p><code>PatchPilotMCPServer</code> implements MCP JSON-RPC 2.0 (<code>2024-11-05</code>) with 5 tools, 2 resources, and 2 prompts over stdio, local HTTP/SSE, and Vercel ASGI.</p>
+
+            <h2 id="sec-stdio-http">Stdio &amp; Local HTTP/SSE</h2>
+            <div class="doc-codeblock">
+              <pre id="docs-mcp-pre">python scripts/smoke_test.py https://patchpilot-eta.vercel.app 4 2 2</pre>
+              <button type="button" class="copy-icon-btn" data-copy-target="docs-mcp-pre" aria-label="Copy smoke test command">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+
+            <h2 id="sec-hosted-guardrails">Hosted Guardrails</h2>
+            <ul>
+              <li><strong>Stateless Tools Allowed</strong>: <code>audit_unified_diff</code>, <code>verify_patch_integrity</code>, <code>localize_fault</code> (inline <code>sources</code>), and <code>inspect_ast_symbols</code> (inline <code>sources</code>).</li>
+              <li><strong>Blocked on Public Endpoint</strong>: <code>apply_transactional_patch</code> and arbitrary <code>workspace_root</code> arguments are blocked in <code>api/index.py</code>.</li>
+              <li><strong>Request Cap &amp; Headers</strong>: 1 MB body cap plus <code>X-Request-ID</code> and <code>X-Content-Type-Options: nosniff</code> on every response.</li>
+            </ul>
+          </section>
+
+          <div class="doc-pagination">
+            <button type="button" class="page-step-btn prev" id="doc-prev-btn" hidden>
+              <small>Previous</small>
+              <strong id="doc-prev-label">—</strong>
+            </button>
+            <button type="button" class="page-step-btn next" id="doc-next-btn">
+              <small>Next</small>
+              <strong id="doc-next-label">AST Guard (RH001–RH008)</strong>
+            </button>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/patchpilot" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>PatchPilot v1.2.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

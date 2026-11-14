@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#fffdf2"/>
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="#fbf8eb" stroke="#1e1b18" stroke-width="3"/>
+  <rect x="86" y="150" width="220" height="200" rx="44" fill="#ffedd5" stroke="#1e1b18" stroke-width="7"/>
+  <path d="M148 150v-34M244 150v-34" stroke="#1e1b18" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="148" cy="112" r="10" fill="#10b981" stroke="#1e1b18" stroke-width="5"/>
+  <circle cx="244" cy="112" r="10" fill="#f97316" stroke="#1e1b18" stroke-width="5"/>
+  <rect x="118" y="186" width="156" height="92" rx="22" fill="#1e1b18"/>
+  <circle cx="164" cy="232" r="14" fill="#10b981"/>
+  <circle cx="228" cy="232" r="14" fill="#f97316"/>
+  <path d="M164 232h64" stroke="#d1fae5" stroke-width="5" stroke-linecap="round" stroke-dasharray="9 9"/>
+  <path d="M160 316h72" stroke="#1e1b18" stroke-width="7" stroke-linecap="round"/>
+  <rect x="352" y="114" width="260" height="42" rx="21" fill="#d1fae5" stroke="#064e3b" stroke-width="2"/>
+  <text x="482" y="142" font-family="-apple-system,Segoe UI,sans-serif" font-size="21" font-weight="700" text-anchor="middle" fill="#064e3b">PATCHPILOT v1.2.0</text>
+  <text x="352" y="232" font-family="-apple-system,Segoe UI,sans-serif" font-size="72" font-weight="800" fill="#1e1b18">Autonomous</text>
+  <text x="352" y="314" font-family="-apple-system,Segoe UI,sans-serif" font-size="72" font-weight="800" fill="#ea580c">Code Repair.</text>
+  <text x="352" y="378" font-family="-apple-system,Segoe UI,sans-serif" font-size="30" font-weight="500" fill="#57534e">AST Fault Localizer · RH001–RH008 Guard · SHA-256 Rollback</text>
+  <rect x="352" y="438" width="215" height="62" rx="14" fill="#ffedd5" stroke="#1e1b18" stroke-width="2.5"/>
+  <text x="459" y="476" font-family="ui-monospace,monospace" font-size="24" font-weight="700" text-anchor="middle" fill="#431407">96.6% Tokens Saved</text>
+  <rect x="588" y="438" width="225" height="62" rx="14" fill="#d1fae5" stroke="#1e1b18" stroke-width="2.5"/>
+  <text x="700" y="476" font-family="ui-monospace,monospace" font-size="24" font-weight="700" text-anchor="middle" fill="#064e3b">100.0% Recall / 0% FPR</text>
+  <rect x="834" y="438" width="250" height="62" rx="14" fill="#ffffff" stroke="#1e1b18" stroke-width="2.5"/>
+  <text x="959" y="476" font-family="ui-monospace,monospace" font-size="24" font-weight="700" text-anchor="middle" fill="#1e1b18">0.101 ms AST Guard</text>
+</svg>

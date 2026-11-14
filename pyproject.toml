@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "patchpilot"
-version = "1.1.0"
+version = "1.2.0"
 description = "Autonomous Code Repair Engine: Stack-Trace & AST Fault Localizer, Anti-Reward-Hacking Patch Verifier, Transactional Sandbox & MCP Server."
 readme = "README.md"
 license = "MIT"
@@ -51,7 +51,8 @@ dev = [
 patchpilot = "patchpilot.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/codesphere-u/patchpilot"
+Homepage = "https://codesphere-u.github.io/patchpilot/"
+Documentation = "https://codesphere-u.github.io/patchpilot/docs.html"
 Repository = "https://github.com/codesphere-u/patchpilot"
 Issues = "https://github.com/codesphere-u/patchpilot/issues"
 

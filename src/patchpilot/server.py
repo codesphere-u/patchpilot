@@ -276,7 +276,7 @@ class PatchPilotMCPServer:
                         "text": json.dumps(
                             {
                                 "server": "patchpilot-mcp",
-                                "version": "1.1.0",
+                                "version": "1.2.0",
                                 "ast_anti_reward_hacking_rules": 8,
                                 "fault_localization_algorithms": ["Stack-Trace Parsing", "AST Bidirectional Call Graph", "BM25 Token Overlap"],
                                 "safety_guarantees": ["Byte-exact SHA-256 Rollback", "Anti-Reward-Hacking G5 Attestation"],
@@ -352,7 +352,7 @@ class PatchPilotMCPServer:
                     "protocolVersion": MCP_PROTOCOL_VERSION,
                     "serverInfo": {
                         "name": "patchpilot-mcp",
-                        "version": "1.1.0",
+                        "version": "1.2.0",
                     },
                     "capabilities": {
                         "tools": {"listChanged": False},

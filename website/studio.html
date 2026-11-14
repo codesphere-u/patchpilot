@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PatchPilot Studio — Live RH001–RH008 Diff Auditor &amp; Token Simulator</title>
+  <meta name="description" content="Audit unified diffs for reward hacking rules RH001-RH008, simulate AST token-budget fault localization, and export MCP configs." />
+  <link rel="canonical" href="https://codesphere-u.github.io/patchpilot/studio.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="PatchPilot Interactive Studio" />
+  <meta property="og:description" content="Test RH001-RH008 anti-reward-hacking rules and AST token-budget ranking right in your browser." />
+  <meta property="og:url" content="https://codesphere-u.github.io/patchpilot/studio.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/patchpilot/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PatchPilot Studio",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "url": "https://codesphere-u.github.io/patchpilot/studio.html",
+    "softwareVersion": "1.2.0",
+    "description": "In-browser simulator for unified diff reward-hacking checks (RH001-RH008), AST fault token budget sizing, and MCP client configuration."
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="PatchPilot Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="PatchPilot">
+          <g fill="#f97316" stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="26" height="26" rx="7" fill="#ffedd5"/>
+            <rect x="7" y="11" width="16" height="10" rx="4" fill="#1e1b18"/>
+            <circle cx="12" cy="16" r="2.2" fill="#10b981" stroke="none"/>
+            <circle cx="18" cy="16" r="2.2" fill="#f97316" stroke="none"/>
+          </g>
+          <text x="36" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.6">PatchPilot</text>
+          <circle cx="151" cy="10" r="3" fill="#10b981" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html" class="active">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/patchpilot" aria-label="PatchPilot GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <h1>PatchPilot Studio</h1>
+        <p class="hero-sub">Inspect candidate unified diffs for reward-hacking signatures, size AST fault token budgets, and generate ready-to-paste MCP configs locally in your browser.</p>
+      </section>
+
+      <section class="studio-frame" aria-label="Interactive PatchPilot Workbench">
+        <div class="handy-tabs-bar">
+          <div class="handy-tabs" role="tablist">
+            <button type="button" class="handy-tab active" data-studio-tab="diff">RH001–RH008 Diff Auditor</button>
+            <button type="button" class="handy-tab" data-studio-tab="localizer">Token Budget Simulator</button>
+            <button type="button" class="handy-tab" data-studio-tab="config">MCP &amp; CI Config</button>
+          </div>
+          <span class="version-tag">v1.2.0 Browser Mode</span>
+        </div>
+
+        <div class="studio-panel active" id="panel-diff">
+          <div class="field">
+            <label>Preset Candidate Patches</label>
+            <div class="preset-pills" id="diff-presets">
+              <button type="button" class="chip-btn active" data-diff-preset="cheat">Reward-Hack Attempt</button>
+              <button type="button" class="chip-btn" data-diff-preset="danger">Shell=True &amp; Eval</button>
+              <button type="button" class="chip-btn" data-diff-preset="protected">Protected CI Config</button>
+              <button type="button" class="chip-btn" data-diff-preset="clean">Genuine Discount Fix</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="studio-diff-input">Unified Git Diff</label>
+            <textarea class="textarea" id="studio-diff-input" rows="8"></textarea>
+          </div>
+          <div class="score-row">
+            <div class="score-cell"><span>Verdict</span><strong id="st-verdict">REJECTED</strong></div>
+            <div class="score-cell"><span>Risk Score</span><strong id="st-risk">1.0000</strong></div>
+            <div class="score-cell"><span>Violations</span><strong id="st-violations-count">3</strong></div>
+            <div class="score-cell"><span>G5 Gate Score</span><strong id="st-g5-score">0.0000</strong></div>
+          </div>
+          <div class="diag-note" id="st-diff-summary">Deterministic client simulation of RH001–RH008 rules plus Nexus Aegis G5 output preview.</div>
+          <div class="rw-list" id="st-violations-list"></div>
+          <div class="field" style="margin-top:0.95rem;">
+            <div class="toolbar-between" style="margin-bottom:0.35rem;">
+              <label style="margin:0;">Nexus Aegis <code>G5_ANTI_REWARD_HACK</code> Attestation Preview</label>
+              <button type="button" class="action-mini" id="copy-aegis-json">Copy G5 JSON</button>
+            </div>
+            <pre class="code-block" id="st-aegis-preview"></pre>
+          </div>
+        </div>
+
+        <div class="studio-panel" id="panel-localizer">
+          <div class="form-row-2">
+            <div class="field">
+              <label for="loc-scenario">Failure Scenario Preset</label>
+              <select class="select" id="loc-scenario">
+                <option value="billing">Billing Volume Discount (303 tokens in 3 slices)</option>
+                <option value="auth">JWT Expiry Skew (412 tokens in 3 slices)</option>
+                <option value="webhook">Webhook Signature Verifier (358 tokens in 3 slices)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="loc-topk">Top-K Functions</label>
+              <select class="select" id="loc-topk">
+                <option value="1">1 slice (Minimal)</option>
+                <option value="2">2 slices</option>
+                <option value="3" selected>3 slices (Recommended)</option>
+                <option value="5">5 slices (Extended)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="loc-budget">Strict Token Budget: <strong id="loc-budget-val">600</strong> tokens</label>
+            <input class="input" type="range" id="loc-budget" min="200" max="2000" step="50" value="600" />
+          </div>
+          <div class="score-row">
+            <div class="score-cell"><span>Full Repo Tokens</span><strong id="loc-full-tokens">8,940</strong></div>
+            <div class="score-cell"><span>Packed Tokens</span><strong id="loc-used-tokens">303</strong></div>
+            <div class="score-cell"><span>Token Reduction</span><strong id="loc-savings">96.6%</strong></div>
+            <div class="score-cell"><span>Slices Included</span><strong id="loc-slices-count">3 / 3</strong></div>
+          </div>
+          <div class="rw-list" id="loc-suspect-list"></div>
+          <div class="field" style="margin-top:0.95rem;">
+            <label>Formatted AST Context Prompt</label>
+            <pre class="code-block" id="loc-prompt-out"></pre>
+          </div>
+        </div>
+
+        <div class="studio-panel" id="panel-config">
+          <div class="form-row-2">
+            <div class="field">
+              <label for="cfg-target">Target Client / Workflow</label>
+              <select class="select" id="cfg-target">
+                <option value="hosted">Claude Code / Cursor (Hosted Vercel MCP)</option>
+                <option value="stdio">Claude Desktop / Cursor (Local Stdio Sandbox)</option>
+                <option value="uvx">Portable uvx Stdio Config</option>
+                <option value="github">GitHub Actions PR Diff Gate</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cfg-workspace">Workspace Path (for local stdio)</label>
+              <input class="input" id="cfg-workspace" type="text" value="/path/to/your/repo" />
+            </div>
+          </div>
+          <div class="toolbar-between" style="margin-bottom:0.45rem;">
+            <span class="eyebrow-label" style="margin:0;">Generated Configuration</span>
+            <button type="button" class="action-mini" id="copy-cfg-btn">Copy Config</button>
+          </div>
+          <pre class="code-block" id="cfg-output"></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/patchpilot" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>PatchPilot v1.2.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

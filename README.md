@@ -1,7 +1,9 @@
 # `patchpilot` — Autonomous Code Repair Engine
 
+> **Live Website & Interactive Studio:** [https://codesphere-u.github.io/patchpilot/](https://codesphere-u.github.io/patchpilot/) · **Interactive Studio:** [Studio](https://codesphere-u.github.io/patchpilot/studio.html) · **Docs:** [Docs](https://codesphere-u.github.io/patchpilot/docs.html) · **Rules (`RH001`–`RH008`):** [Catalog](https://codesphere-u.github.io/patchpilot/rules.html)
+
 [![CI](https://github.com/codesphere-u/patchpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/patchpilot/actions/workflows/ci.yml)
-[![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/codesphere-u/patchpilot/releases/tag/v1.1.0)
+[![Release v1.2.0](https://img.shields.io/badge/release-v1.2.0-f97316.svg)](https://github.com/codesphere-u/patchpilot/releases/tag/v1.2.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://patchpilot-eta.vercel.app/mcp)
@@ -234,11 +236,14 @@ Feed a raw stack trace to get exact line-numbered AST function slices within an 
 
 ---
 
-## Architecture Decision Records (ADRs)
+## Documentation & Architecture Decision Records (ADRs)
 
+- [Getting Started Guide](docs/GETTING_STARTED.md) — CLI workflows (`demo`, `benchmark`, `audit-diff`, `export-aegis`), Python SDK usage, and CI diff gates.
+- [MCP & Vercel Gateway Guide](docs/MCP_AND_VERCEL.md) — Claude Code, Cursor, stdio `uvx`, Streamable HTTP, Nexus Aegis G5 bridging, and hosted safety guardrails.
 - [ADR-001: Deterministic AST Verification Against Coding Agent Reward Hacking (`RH001`–`RH008`)](docs/ADR-001-ast-anti-reward-hacking.md)
 - [ADR-002: Hybrid Stack-Trace + AST Call-Graph + BM25 Spectrum Fault Localization](docs/ADR-002-hybrid-fault-localization.md)
 - [ADR-003: Snapshot-Backed Transactional Patch Sandbox & Cryptographic Repair Receipts](docs/ADR-003-transactional-sandbox-receipts.md)
+- [Live Web Documentation & Rules Explorer](https://codesphere-u.github.io/patchpilot/docs.html)
 
 ---
 

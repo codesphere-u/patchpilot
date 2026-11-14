@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PatchPilot Proof &amp; Reproducible Benchmarks (v1.2.0)</title>
+  <meta name="description" content="Reproducible PatchPilot v1.2.0 benchmark metrics: 100% Top-1 fault localization, 96.6% token reduction, and 0.101 ms guard checks." />
+  <link rel="canonical" href="https://codesphere-u.github.io/patchpilot/proof.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="PatchPilot Proof &amp; Reproducible Benchmarks" />
+  <meta property="og:description" content="Observed benchmark latencies, accuracy, and SHA-256 rollback demo output from patchpilot benchmark." />
+  <meta property="og:url" content="https://codesphere-u.github.io/patchpilot/proof.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/patchpilot/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "PatchPilot v1.2.0 Reproducible Benchmark Proof",
+    "description": "Empirical accuracy, false-positive rate, and p50/p95 latencies across AST indexing, hybrid fault localization, and anti-reward-hacking checks.",
+    "url": "https://codesphere-u.github.io/patchpilot/proof.html",
+    "author": {
+      "@type": "Person",
+      "name": "Akandwanaho Ivan Alvin"
+    }
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="PatchPilot Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="PatchPilot">
+          <g fill="#f97316" stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="26" height="26" rx="7" fill="#ffedd5"/>
+            <rect x="7" y="11" width="16" height="10" rx="4" fill="#1e1b18"/>
+            <circle cx="12" cy="16" r="2.2" fill="#10b981" stroke="none"/>
+            <circle cx="18" cy="16" r="2.2" fill="#f97316" stroke="none"/>
+          </g>
+          <text x="36" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.6">PatchPilot</text>
+          <circle cx="151" cy="10" r="3" fill="#10b981" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html" class="active">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/patchpilot" aria-label="PatchPilot GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <h1>Reproducible Proof</h1>
+        <p class="hero-sub">Every metric below comes from running <code>patchpilot benchmark</code>, <code>patchpilot demo</code>, and <code>pytest</code> directly on v1.2.0.</p>
+      </section>
+
+      <section class="score-row" aria-label="Headline Benchmark Numbers">
+        <div class="score-cell"><span>Top-1 / Top-3</span><strong>100.0%</strong></div>
+        <div class="score-cell"><span>Token Reduction</span><strong>96.6%</strong></div>
+        <div class="score-cell"><span>Guard Recall / FPR</span><strong>100% / 0%</strong></div>
+        <div class="score-cell"><span>Guard p50 Latency</span><strong>0.101 ms</strong></div>
+      </section>
+
+      <section class="editorial-article">
+        <h2>Subsystem Benchmark Suite (<code>patchpilot benchmark</code>)</h2>
+        <p>Run the built-in harness locally with <code>patchpilot benchmark --json</code> to inspect machine-specific timings across all three subsystems.</p>
+        <div class="doc-table-wrap">
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Subsystem</th>
+                <th>Benchmark Workload</th>
+                <th>Accuracy / Recall</th>
+                <th>Secondary Metric</th>
+                <th>p50 Latency</th>
+                <th>p95 Latency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AST Symbol &amp; Call-Graph Indexer</strong></td>
+                <td>50 files / 100 symbols</td>
+                <td>100.0% AST parse coverage</td>
+                <td>Bidirectional call edges</td>
+                <td>4.19 ms</td>
+                <td>4.19 ms</td>
+              </tr>
+              <tr>
+                <td><strong>Hybrid Fault Localizer</strong></td>
+                <td>25 stack &amp; call-graph fault scenarios</td>
+                <td>100.0% Top-1 / 100.0% Top-3</td>
+                <td>96.6% prompt token reduction</td>
+                <td>0.393 ms</td>
+                <td>0.789 ms</td>
+              </tr>
+              <tr>
+                <td><strong>Anti-Reward-Hacking Guard (RH001–RH008)</strong></td>
+                <td>20 adversarial + 20 legitimate patches</td>
+                <td>100.0% Recall / 100.0% Precision</td>
+                <td>0.0% False Positive Rate</td>
+                <td>0.101 ms</td>
+                <td>0.409 ms</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>End-to-End Repair Transaction Demo (<code>patchpilot demo</code>)</h2>
+        <p>Observed execution output comparing an adversarial reward-hacking patch against a clean minimal bug fix inside <code>TransactionalPatchWorkspace</code>:</p>
+        <div class="doc-codeblock">
+          <pre>[1] HYBRID STACK-TRACE + AST CALL-GRAPH FAULT LOCALIZATION
+  #1 billing/invoice.py::calculate_tiered_invoice (score=0.852, tokens=87) -> direct stack frame
+  #2 billing/pricing.py::apply_volume_discount    (score=0.239, tokens=134) -> 1-hop AST neighbor
+  #3 billing/tax.py::compute_regional_tax         (score=0.208, tokens=82) -> 1-hop AST neighbor
+  Token Budget Used: 303/600 tokens across 3 suspect function slices.
+
+[2] ADVERSARIAL REWARD-HACKING PATCH ATTEMPT (BLOCKED &amp; ROLLED BACK)
+  Status       : ROLLED_BACK (stage=integrity_guard)
+  Risk Score   : 1.0000
+  Violations   : [RH003] except...: pass, [RH001] @pytest.mark.skip injected, [RH002] assert True
+  State Intact : True
+
+[3] GENUINE MINIMAL PATCH TRANSACTION (COMMITTED)
+  Status       : COMMITTED
+  Verification : Verified calculate_tiered_invoice(1000, 10, 'DEFAULT') == 8925
+  Verified     : True (SHA-256 RepairReceipt generated)</pre>
+        </div>
+
+        <h2>Architecture Decision Records</h2>
+        <ul>
+          <li><a class="inline-link" href="https://github.com/codesphere-u/patchpilot/blob/main/docs/ADR-001-ast-anti-reward-hacking.md" target="_blank" rel="noopener">ADR-001: Deterministic AST Verification Against Coding Agent Reward Hacking (RH001–RH008)</a></li>
+          <li><a class="inline-link" href="https://github.com/codesphere-u/patchpilot/blob/main/docs/ADR-002-hybrid-fault-localization.md" target="_blank" rel="noopener">ADR-002: Hybrid Stack-Trace + AST Call-Graph + BM25 Spectrum Fault Localization</a></li>
+          <li><a class="inline-link" href="https://github.com/codesphere-u/patchpilot/blob/main/docs/ADR-003-transactional-sandbox-receipts.md" target="_blank" rel="noopener">ADR-003: Snapshot-Backed Transactional Patch Sandbox &amp; Cryptographic Repair Receipts</a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/patchpilot" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>PatchPilot v1.2.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PatchPilot Rules &amp; MCP Capabilities Matrix (RH001–RH008)</title>
+  <meta name="description" content="Explore all 8 PatchPilot AST anti-reward-hacking rules (RH001-RH008), 5 MCP tools, resources, prompts, and CLI subcommands." />
+  <link rel="canonical" href="https://codesphere-u.github.io/patchpilot/rules.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="PatchPilot Rules &amp; MCP Matrix" />
+  <meta property="og:description" content="Searchable matrix of AST guard rules RH001-RH008, severity weights, and JSON-RPC 2.0 MCP tools." />
+  <meta property="og:url" content="https://codesphere-u.github.io/patchpilot/rules.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/patchpilot/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "PatchPilot AST Rules RH001-RH008 & MCP Tools Matrix",
+    "description": "Filterable reference of AST anti-reward-hacking rules, severity weights, Model Context Protocol tools, resources, prompts, and CLI commands.",
+    "url": "https://codesphere-u.github.io/patchpilot/rules.html",
+    "author": {
+      "@type": "Person",
+      "name": "Akandwanaho Ivan Alvin"
+    }
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="PatchPilot Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="PatchPilot">
+          <g fill="#f97316" stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="26" height="26" rx="7" fill="#ffedd5"/>
+            <rect x="7" y="11" width="16" height="10" rx="4" fill="#1e1b18"/>
+            <circle cx="12" cy="16" r="2.2" fill="#10b981" stroke="none"/>
+            <circle cx="18" cy="16" r="2.2" fill="#f97316" stroke="none"/>
+          </g>
+          <text x="36" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.6">PatchPilot</text>
+          <circle cx="151" cy="10" r="3" fill="#10b981" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html" class="active">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/patchpilot" aria-label="PatchPilot GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <h1>Rules &amp; Capabilities Matrix</h1>
+        <p class="hero-sub">Filter all 8 deterministic AST rules (<code>RH001</code>–<code>RH008</code>), 5 MCP tools, resources, prompts, and CLI subcommands.</p>
+      </section>
+
+      <section aria-label="Rules Filter">
+        <div class="rules-filter">
+          <input class="input" id="rules-search" type="search" placeholder="Search rules, e.g. RH002, eval, skip, audit_unified_diff..." aria-label="Search rules and MCP capabilities" />
+          <select class="select" id="rules-category" aria-label="Filter by category">
+            <option value="all">All Capabilities (20)</option>
+            <option value="guard">AST Guard Rules (8)</option>
+            <option value="mcp-tool">MCP Tools (5)</option>
+            <option value="mcp-surface">MCP Resources &amp; Prompts (4)</option>
+            <option value="cli">CLI Subcommands (3)</option>
+          </select>
+        </div>
+        <div class="toolbar-between" style="margin-bottom:0.75rem;">
+          <span class="eyebrow-label" id="rules-count" style="margin:0;">Showing 20 of 20 capabilities</span>
+          <button type="button" class="action-mini" id="rules-reset">Reset Filters</button>
+        </div>
+
+        <div class="doc-table-wrap">
+          <table class="doc-table" id="rules-table">
+            <thead>
+              <tr>
+                <th>ID / Symbol</th>
+                <th>Category</th>
+                <th>Severity / Scope</th>
+                <th>Deterministic Behavior</th>
+              </tr>
+            </thead>
+            <tbody id="rules-tbody">
+              <tr data-cat="guard"><td><code>RH001</code></td><td><span class="pill pill-bad">Guard AST</span></td><td><span class="pill pill-copper">Weight 0.95</span></td><td>Test Deletion or Skip/XFail Injection (<code>@pytest.mark.skip</code>, <code>xfail</code>, removed <code>test_*</code> functions).</td></tr>
+              <tr data-cat="guard"><td><code>RH002</code></td><td><span class="pill pill-bad">Guard AST</span></td><td><span class="pill pill-copper">Weight 0.90</span></td><td>Assertion Weakening, Removal, or Tautology (<code>assert True</code>, altered expected comparison AST nodes).</td></tr>
+              <tr data-cat="guard"><td><code>RH003</code></td><td><span class="pill pill-bad">Guard AST</span></td><td><span class="pill pill-copper">Weight 0.80</span></td><td>Broad Exception Swallowing (bare <code>except:</code> or <code>except Exception: pass</code> handlers).</td></tr>
+              <tr data-cat="guard"><td><code>RH004</code></td><td><span class="pill pill-bad">Guard AST</span></td><td><span class="pill pill-bad">Weight 1.00</span></td><td>Python Syntax / AST Parse Failure across any candidate Python file in the patch.</td></tr>
+              <tr data-cat="guard"><td><code>RH005</code></td><td><span class="pill pill-bad">Guard AST</span></td><td><span class="pill pill-copper">Weight 0.95</span></td><td>Forbidden Dangerous Primitive (<code>eval</code>, <code>exec</code>, <code>os.system</code>, <code>subprocess(..., shell=True)</code>).</td></tr>
+              <tr data-cat="guard"><td><code>RH006</code></td><td><span class="pill pill-warn">Guard AST</span></td><td><span class="pill pill-warn">Weight 0.65</span></td><td>Debug Breakpoint or Forced Exit Leftover (<code>breakpoint()</code>, <code>pdb.set_trace()</code>, <code>sys.exit()</code>).</td></tr>
+              <tr data-cat="guard"><td><code>RH007</code></td><td><span class="pill pill-warn">Guard AST</span></td><td><span class="pill pill-warn">Weight 0.60</span></td><td>Excessive Patch Blast Radius exceeding <code>max_files_touched</code> (5) or <code>max_lines_changed</code> (250).</td></tr>
+              <tr data-cat="guard"><td><code>RH008</code></td><td><span class="pill pill-bad">Guard AST</span></td><td><span class="pill pill-copper">Weight 0.90</span></td><td>Protected File or CI Config Modification (<code>.github/*</code>, <code>pyproject.toml</code>, <code>.env*</code>, lockfiles, <code>conftest.py</code>).</td></tr>
+
+              <tr data-cat="mcp-tool"><td><code>audit_unified_diff</code></td><td><span class="pill pill-mint">MCP Tool</span></td><td><span class="pill pill-good">Hosted + Local</span></td><td>Parse &amp; audit multi-file unified diffs against <code>RH001</code>–<code>RH008</code>; optionally emit Nexus Aegis G5 leaf.</td></tr>
+              <tr data-cat="mcp-tool"><td><code>localize_fault</code></td><td><span class="pill pill-mint">MCP Tool</span></td><td><span class="pill pill-good">Hosted (Inline)</span></td><td>Rank suspect functions from traceback text via Stack-Trace + AST Call-Graph + BM25 inside <code>token_budget</code>.</td></tr>
+              <tr data-cat="mcp-tool"><td><code>verify_patch_integrity</code></td><td><span class="pill pill-mint">MCP Tool</span></td><td><span class="pill pill-good">Hosted + Local</span></td><td>Compare <code>original_files</code> vs <code>patched_files</code> or unified diff against <code>RH001</code>–<code>RH008</code>.</td></tr>
+              <tr data-cat="mcp-tool"><td><code>inspect_ast_symbols</code></td><td><span class="pill pill-mint">MCP Tool</span></td><td><span class="pill pill-good">Hosted (Inline)</span></td><td>Query AST symbol table &amp; bidirectional callers/callees by symbol name or <code>(file_path, line_number)</code>.</td></tr>
+              <tr data-cat="mcp-tool"><td><code>apply_transactional_patch</code></td><td><span class="pill pill-mint">MCP Tool</span></td><td><span class="pill pill-warn">Local Stdio Only</span></td><td>Apply patch inside SHA-256 snapshot sandbox with automatic rollback on violation or test failure.</td></tr>
+
+              <tr data-cat="mcp-surface"><td><code>patchpilot://rules/catalog</code></td><td><span class="pill pill-copper">MCP Resource</span></td><td><span class="pill">application/json</span></td><td>Machine-readable catalog of <code>RH001</code>–<code>RH008</code> codes, descriptions, and severity weights.</td></tr>
+              <tr data-cat="mcp-surface"><td><code>patchpilot://stats/overview</code></td><td><span class="pill pill-copper">MCP Resource</span></td><td><span class="pill">application/json</span></td><td>Server version (<code>1.2.0</code>), fault algorithms, and rollback safety guarantees.</td></tr>
+              <tr data-cat="mcp-surface"><td><code>diagnose-and-repair</code></td><td><span class="pill pill-copper">MCP Prompt</span></td><td><span class="pill">traceback_text</span></td><td>Guided root-cause workflow instructing agents to localize AST slices before proposing fixes.</td></tr>
+              <tr data-cat="mcp-surface"><td><code>audit-git-diff</code></td><td><span class="pill pill-copper">MCP Prompt</span></td><td><span class="pill">unified_diff</span></td><td>Structured code review checklist verifying zero <code>RH001</code>–<code>RH008</code> test-cheating patterns.</td></tr>
+
+              <tr data-cat="cli"><td><code>patchpilot demo / benchmark</code></td><td><span class="pill pill-good">CLI</span></td><td><span class="pill">--json</span></td><td>Run interactive billing bug rollback demo or reproduce p50/p95 AST &amp; guard benchmarks.</td></tr>
+              <tr data-cat="cli"><td><code>patchpilot audit-diff / export-aegis</code></td><td><span class="pill pill-good">CLI</span></td><td><span class="pill">stdin / file</span></td><td>Fail CI (`exit 1`) on diff violations or export RFC 6962 Nexus Aegis G5 leaf JSON.</td></tr>
+              <tr data-cat="cli"><td><code>patchpilot serve-stdio / serve-http</code></td><td><span class="pill pill-good">CLI</span></td><td><span class="pill">JSON-RPC 2.0</span></td><td>Serve full workspace MCP tools over stdio or Streamable HTTP/SSE (`mcp` alias supported).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/patchpilot" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>PatchPilot v1.2.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

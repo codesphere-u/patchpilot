@@ -16,7 +16,7 @@ from portal import render_developer_portal
 def test_portal_html_render():
     html = render_developer_portal(
         server_name="patchpilot",
-        server_version="1.1.0",
+        server_version="1.2.0",
         tagline="Autonomous Code Repair Engine",
         endpoint_url="https://patchpilot-eta.vercel.app/mcp",
         github_url="https://github.com/codesphere-u/patchpilot",

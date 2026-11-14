@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PatchPilot — Autonomous Code Repair &amp; AST Anti-Reward-Hacking Guard</title>
+  <meta name="description" content="Hybrid AST fault localizer, RH001-RH008 anti-reward-hacking verifier, and SHA-256 rollback sandbox for Python agents." />
+  <link rel="canonical" href="https://codesphere-u.github.io/patchpilot/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PatchPilot" />
+  <meta property="og:title" content="PatchPilot — Autonomous Code Repair &amp; AST Guard" />
+  <meta property="og:description" content="Cut fault context tokens by 96.6%, catch reward-hacking diffs in 0.101 ms, and roll back failing repairs with SHA-256 precision." />
+  <meta property="og:url" content="https://codesphere-u.github.io/patchpilot/" />
+  <meta property="og:image" content="https://codesphere-u.github.io/patchpilot/og-image.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PatchPilot v1.2.0 — Autonomous Code Repair Engine" />
+  <meta name="twitter:description" content="Hybrid AST fault localizer, RH001-RH008 anti-reward-hacking verifier, and SHA-256 rollback sandbox." />
+  <meta name="twitter:image" content="https://codesphere-u.github.io/patchpilot/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" title="LLMs Summary" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Codesphere Innovations",
+        "url": "https://github.com/codesphere-u"
+      },
+      {
+        "@type": "Person",
+        "name": "Akandwanaho Ivan Alvin",
+        "url": "https://github.com/codesphere-u"
+      },
+      {
+        "@type": "WebSite",
+        "name": "PatchPilot",
+        "url": "https://codesphere-u.github.io/patchpilot/"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "PatchPilot",
+        "softwareVersion": "1.2.0",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "url": "https://codesphere-u.github.io/patchpilot/",
+        "downloadUrl": "https://github.com/codesphere-u/patchpilot/releases/tag/v1.2.0",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Autonomous code repair engine with Stack-Trace + AST Call-Graph + BM25 fault localization, 8-rule anti-reward-hacking guard, and SHA-256 transactional rollback."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does PatchPilot prevent coding agents from reward hacking tests?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "PatchIntegrityGuard parses both original and patched Python ASTs against eight deterministic rules (RH001 through RH008) to block test deletions, skip decorators, assert True tautologies, bare exception swallowing, dangerous eval or shell=True primitives, and protected config edits in 0.101 ms p50."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many prompt tokens does FaultLocalizer save?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Across the 25-scenario fault benchmark, FaultLocalizer achieves 100.0% Top-1 recall and 96.6% prompt token reduction by returning line-numbered suspect AST slices inside a strict token budget."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use PatchPilot over MCP without modifying disk files?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. The hosted MCP endpoint at https://patchpilot-eta.vercel.app/mcp exposes audit_unified_diff, verify_patch_integrity, localize_fault, and inspect_ast_symbols over JSON-RPC 2.0 while blocking disk writes."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="PatchPilot Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="PatchPilot">
+          <g fill="#f97316" stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="26" height="26" rx="7" fill="#ffedd5"/>
+            <rect x="7" y="11" width="16" height="10" rx="4" fill="#1e1b18"/>
+            <circle cx="12" cy="16" r="2.2" fill="#10b981" stroke="none"/>
+            <circle cx="18" cy="16" r="2.2" fill="#f97316" stroke="none"/>
+          </g>
+          <text x="36" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.6">PatchPilot</text>
+          <circle cx="151" cy="10" r="3" fill="#10b981" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/patchpilot" aria-label="PatchPilot GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero-duo">
+        <div class="mascot-wrap" aria-hidden="true">
+          <svg viewBox="0 0 140 140" width="140" height="140">
+            <rect x="14" y="26" width="112" height="96" rx="28" fill="#ffedd5" stroke="#1e1b18" stroke-width="4.5"/>
+            <path d="M44 26V12M96 26V12" stroke="#1e1b18" stroke-width="4.5" stroke-linecap="round"/>
+            <circle cx="44" cy="10" r="6" fill="#10b981" stroke="#1e1b18" stroke-width="3.5"/>
+            <circle cx="96" cy="10" r="6" fill="#f97316" stroke="#1e1b18" stroke-width="3.5"/>
+            <rect x="28" y="44" width="84" height="46" rx="16" fill="#1e1b18"/>
+            <circle cx="52" cy="67" r="8" fill="#10b981"/>
+            <circle cx="88" cy="67" r="8" fill="#f97316"/>
+            <path d="M52 67h36" stroke="#d1fae5" stroke-width="3" stroke-dasharray="5 5" stroke-linecap="round"/>
+            <path d="M50 104h40" stroke="#1e1b18" stroke-width="4.5" stroke-linecap="round"/>
+            <path d="M32 34l8-8 8 8" fill="none" stroke="#c2410c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="hero-copy">
+          <h1>Repair bugs fast. Block agent reward hacking.</h1>
+          <p class="hero-sub">Cut traceback context tokens by 96.6%, catch test-cheating AST diffs in 0.101&nbsp;ms, and verify fixes inside a byte-exact SHA-256 rollback sandbox.</p>
+        </div>
+      </section>
+
+      <section class="cta-area" aria-label="Install PatchPilot">
+        <div class="split-btn-group">
+          <button type="button" class="split-main" id="cta-copy-btn">
+            <strong>Copy Install Command</strong>
+            <span>v1.2.0 · MIT License · Python 3.11+ &amp; MCP</span>
+          </button>
+          <button type="button" class="split-caret" id="cta-popover-toggle" aria-expanded="false" aria-controls="cta-popover" aria-label="Switch command preset">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+        <div class="cmd-caption" id="cta-caption-text">pip install -e ".[dev]" &amp;&amp; patchpilot demo</div>
+
+        <div class="cta-popover" id="cta-popover">
+          <div class="pop-tabs" role="tablist" aria-label="Install presets">
+            <button type="button" class="pop-tab active" data-cmd="pip install -e &quot;.[dev]&quot; &amp;&amp; patchpilot demo">Pip + Demo</button>
+            <button type="button" class="pop-tab" data-cmd="patchpilot benchmark --json">Benchmark</button>
+            <button type="button" class="pop-tab" data-cmd="git diff | patchpilot audit-diff">CI Diff Gate</button>
+            <button type="button" class="pop-tab" data-cmd="claude mcp add --transport http patchpilot https://patchpilot-eta.vercel.app/mcp">Hosted MCP</button>
+          </div>
+          <div class="pop-cmd">
+            <code id="cta-pop-code">pip install -e ".[dev]" &amp;&amp; patchpilot demo</code>
+            <button type="button" class="copy-icon-btn" id="cta-pop-copy" aria-label="Copy selected command">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview-frame" aria-label="Interactive PatchPilot Pipeline Preview">
+        <div class="frame-bar">
+          <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="frame-tabs" role="tablist">
+            <button type="button" class="frame-tab active" data-home-tab="localizer">1. Localize Fault</button>
+            <button type="button" class="frame-tab" data-home-tab="guard">2. AST Anti-Cheat Guard</button>
+            <button type="button" class="frame-tab" data-home-tab="sandbox">3. SHA-256 Sandbox</button>
+          </div>
+          <a class="frame-open-link" href="studio.html">Open Studio →</a>
+        </div>
+        <div class="preview-body" id="home-preview-body"></div>
+        <div class="preview-foot">
+          <span>Verified against <strong>patchpilot benchmark</strong> (v1.2.0)</span>
+          <span class="preview-foot-links">
+            <a href="proof.html">Read Benchmarks</a>
+            <a href="rules.html">Inspect RH001–RH008</a>
+          </span>
+        </div>
+      </section>
+
+      <hr class="hairline" />
+
+      <section class="editorial-grid" aria-label="Why PatchPilot">
+        <article>
+          <h2>No Context Flooding</h2>
+          <p><code>FaultLocalizer</code> parses tracebacks, traverses a bidirectional Python AST call graph, and scores lexical overlap with BM25—cutting prompt size by <strong>96.6%</strong> at <strong>100.0% Top-1</strong> recall.</p>
+        </article>
+        <article>
+          <h2>No Reward Hacking</h2>
+          <p><code>PatchIntegrityGuard</code> audits AST pairs across 8 deterministic rules (<code>RH001</code>–<code>RH008</code>) to block skipped tests, <code>assert True</code> hacks, and <code>eval</code>/<code>shell=True</code> primitives with <strong>0.0% FPR</strong>.</p>
+        </article>
+        <article>
+          <h2>Byte-Exact Rollback</h2>
+          <p><code>TransactionalPatchWorkspace</code> snapshots files before touching disk, runs verification tests, restores exact pre-state bytes on any failure, and signs a SHA-256 <code>RepairReceipt</code>.</p>
+        </article>
+        <article>
+          <h2>Hosted &amp; Stdio MCP</h2>
+          <p>Ship 5 deterministic tools, 2 resources, and 2 prompts over stdio, local HTTP/SSE, or our stateless Vercel gateway at <code>patchpilot-eta.vercel.app/mcp</code>.</p>
+        </article>
+      </section>
+
+      <hr class="hairline" />
+
+      <section class="ecosystem-section">
+        <h2>Part of a deterministic agent stack</h2>
+        <p class="ecosystem-sub">Pair PatchPilot AST receipts directly with Nexus Aegis Merkle attestation bundles and zero-risk CI merge gates.</p>
+        <div class="eco-badges">
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">AST</div>
+            <span>Call Graph</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">RH8</div>
+            <span>8 Guard Rules</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">SHA</div>
+            <span>Rollback Receipt</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">G5</div>
+            <span>Nexus Aegis</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">MCP</div>
+            <span>5 JSON-RPC Tools</span>
+          </div>
+        </div>
+        <p class="inline-cta-links">Try a candidate diff in the <a href="studio.html">Interactive Studio</a> or inspect <a href="docs.html">CLI &amp; MCP setup</a>.</p>
+      </section>
+
+      <hr class="hairline" />
+
+      <section aria-label="Frequently Asked Questions">
+        <h2 class="sec-title">Questions teams ask first</h2>
+        <div class="faq-stack">
+          <details class="faq-item">
+            <summary>Why build an AST guard when CI runs tests anyway?</summary>
+            <p>Autonomous coding agents often make CI pass by deleting failing assertions, decorating tests with <code>@pytest.mark.skip</code>, wrapping errors in <code>except Exception: pass</code>, or editing test helpers. CI reports green even though the bug remains. <code>PatchIntegrityGuard</code> rejects those diffs at AST parse time in 0.101&nbsp;ms p50.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How does PatchPilot reduce token consumption without missing helper bugs?</summary>
+            <p>A bug inside a 1-hop callee often surfaces in a caller frame. <code>FaultLocalizer</code> weights traceback frames alongside bidirectional AST call-graph edges and BM25 error tokens, packing only the minimal line-numbered function slices into your target budget.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is apply_transactional_patch exposed on the public Vercel endpoint?</summary>
+            <p>No. For safety, <code>api/index.py</code> puts <code>apply_transactional_patch</code> in <code>HOSTED_BLOCKED_TOOLS</code> and rejects <code>workspace_root</code> arguments on public HTTP requests. Run <code>patchpilot serve-stdio</code> locally for snapshot mutations.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/patchpilot" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>PatchPilot v1.2.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

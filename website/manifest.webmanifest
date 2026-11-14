@@ -1,0 +1,17 @@
+{
+  "name": "PatchPilot — Autonomous Code Repair Engine",
+  "short_name": "PatchPilot",
+  "version": "1.2.0",
+  "description": "Hybrid Stack-Trace & AST Fault Localizer, 8-Rule Anti-Reward-Hacking Guard (RH001–RH008), and SHA-256 Rollback Sandbox with MCP Server.",
+  "start_url": "/patchpilot/",
+  "display": "standalone",
+  "background_color": "#fffdf2",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

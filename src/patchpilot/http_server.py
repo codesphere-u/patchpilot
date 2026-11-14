@@ -37,7 +37,7 @@ class PatchPilotHTTPHandler(BaseHTTPRequestHandler):
                 {
                     "status": "healthy",
                     "server": "patchpilot",
-                    "version": "1.1.0",
+                    "version": "1.2.0",
                     "transport": ["stdio", "http", "sse"],
                     "description": "Self-Healing Automated Test Failure Repair & Code Refactoring MCP Server",
                 }

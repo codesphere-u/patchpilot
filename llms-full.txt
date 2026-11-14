@@ -1,0 +1,53 @@
+# PatchPilot v1.2.0 — Complete Reference
+
+PatchPilot solves three failure modes in autonomous coding agents: context-window flooding (`FaultLocalizer` cuts prompt tokens by `96.6%`), agent reward hacking (`PatchIntegrityGuard` blocks test cheating across `RH001`–`RH008` with `100.0%` recall and `0.0%` false positives), and unrecoverable partial edits (`TransactionalPatchWorkspace` enforces SHA-256 byte-exact rollback and emits cryptographic `RepairReceipt` records).
+
+## Installation & Quickstart
+- Install editable dev package: `pip install -e ".[dev]"`
+- End-to-end interactive demo: `patchpilot demo`
+- Reproducible benchmark suite: `patchpilot benchmark --json`
+- Audit a git unified diff in CI: `git diff | patchpilot audit-diff`
+- Export Nexus Aegis G5 leaf attestation: `git diff | patchpilot export-aegis --task-id pr_42`
+- Start local MCP stdio server: `patchpilot serve-stdio --workspace /path/to/repo` (or `patchpilot mcp`)
+- Start local HTTP/SSE MCP server: `patchpilot serve-http --host 127.0.0.1 --port 8000`
+
+## Observed v1.2.0 Benchmark Suite (`patchpilot benchmark`)
+- AST Symbol & Call-Graph Indexer (50 files / 100 symbols): `100.0%` AST parse coverage, bidirectional call edges, `4.19 ms` p50, `4.19 ms` p95.
+- Hybrid Fault Localizer (`FaultLocalizer`, 25 stack & call-graph fault scenarios): `100.0%` Top-1 accuracy, `100.0%` Top-3 accuracy, `96.6%` prompt token reduction, `0.393 ms` p50, `0.789 ms` p95.
+- Anti-Reward-Hacking Guard (`RH001`–`RH008`, 20 adversarial + 20 legitimate patches): `100.0%` Recall, `100.0%` Precision, `0.0%` False Positive Rate, `0.101 ms` p50, `0.409 ms` p95.
+
+## AST Anti-Reward-Hacking Rules (`RH001`–`RH008`)
+- `RH001` (severity weight `0.95`): Test Deletion or Skip/XFail Injection (`@pytest.mark.skip`, `skipIf`, `xfail`, deleted `test_*` functions).
+- `RH002` (severity weight `0.90`): Assertion Weakening, Removal, or Tautology (`assert True`, `assert 1 == 1`, deleted assertions).
+- `RH003` (severity weight `0.80`): Broad Exception Swallowing (`except:` / `except Exception: pass` / dummy return).
+- `RH004` (severity weight `1.00`): Python Syntax / AST Parse Failure.
+- `RH005` (severity weight `0.95`): Forbidden Dangerous Primitive (`eval`, `exec`, `os.system`, `subprocess(..., shell=True)`).
+- `RH006` (severity weight `0.65`): Debug Breakpoint or Forced Exit Leftover (`breakpoint()`, `pdb.set_trace()`, `sys.exit()`).
+- `RH007` (severity weight `0.60`): Excessive Patch Blast Radius (`max_files_touched`, `max_lines_changed`).
+- `RH008` (severity weight `0.90`): Protected File or CI Configuration Modification (`.github/**`, `pyproject.toml`, `.env*`, `conftest.py`, lockfiles).
+
+## Model Context Protocol (MCP) Surface
+- Tools (`5`):
+  - `audit_unified_diff`: Audit multi-file unified diff against `RH001`–`RH008` with optional Nexus Aegis `G5_ANTI_REWARD_HACK` attestation export.
+  - `localize_fault`: Rank suspect Python functions/methods from traceback text using Stack-Trace + AST Call-Graph + BM25 within `token_budget`.
+  - `verify_patch_integrity`: Evaluate `original_files` vs `patched_files` (or `unified_diff`) against `RH001`–`RH008`.
+  - `apply_transactional_patch`: Apply candidate patch inside snapshot-backed workspace with automatic SHA-256 rollback on failure (local stdio / library only; disabled on hosted Vercel endpoint).
+  - `inspect_ast_symbols`: Query workspace AST symbol table and bidirectional caller/callee edges by symbol name or `(file_path, line_number)`.
+- Resources (`2`):
+  - `patchpilot://rules/catalog` (`application/json`)
+  - `patchpilot://stats/overview` (`application/json`)
+- Prompts (`2`):
+  - `diagnose-and-repair` (`traceback_text`, optional `suspect_file`)
+  - `audit-git-diff` (`unified_diff`)
+
+## Hosted Stateless MCP Endpoint
+- Streamable HTTP JSON-RPC: `https://patchpilot-eta.vercel.app/mcp`
+- Health Probe: `https://patchpilot-eta.vercel.app/health`
+- Restrictions on public Vercel deployment: `apply_transactional_patch` is blocked (`HOSTED_BLOCKED_TOOLS`) and `workspace_root` is forbidden on stateless tools (`sources` inline map required).
+
+## Documentation Map
+- Getting Started: https://github.com/codesphere-u/patchpilot/blob/main/docs/GETTING_STARTED.md
+- MCP & Vercel Gateway: https://github.com/codesphere-u/patchpilot/blob/main/docs/MCP_AND_VERCEL.md
+- ADR-001 (Anti-Reward-Hacking): https://github.com/codesphere-u/patchpilot/blob/main/docs/ADR-001-ast-anti-reward-hacking.md
+- ADR-002 (Hybrid Fault Localization): https://github.com/codesphere-u/patchpilot/blob/main/docs/ADR-002-hybrid-fault-localization.md
+- ADR-003 (Transactional Sandbox): https://github.com/codesphere-u/patchpilot/blob/main/docs/ADR-003-transactional-sandbox-receipts.md

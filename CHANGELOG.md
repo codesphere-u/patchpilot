@@ -2,6 +2,17 @@
 
 All notable changes to `patchpilot` will be documented in this file.
 
+## [1.2.0] - 2026-11-14
+
+### Added
+- **Editorial Documentation Site & Interactive Studio (`website/`)**:
+  - Multi-page Warm Ivory light-theme website (`index.html`, `studio.html`, `proof.html`, `rules.html`, `docs.html`) with Copper Orange (`#f97316`) & Surgical Mint (`#10b981`) palette and custom vector mascot/wordmark.
+  - Interactive in-browser PatchPilot Studio with live `RH001`–`RH008` diff auditing, fault localization token-budget simulator, and copy-ready MCP/Vercel client configuration generator.
+  - GitHub Pages deployment workflow (`.github/workflows/pages.yml`), GEO/SEO discovery files (`llms.txt`, `llms-full.txt`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, Schema.org `@graph` JSON-LD), and launch/SEO playbooks (`website/marketing/`).
+- **Guides & Typing Hardening**:
+  - Added [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) and [`docs/MCP_AND_VERCEL.md`](docs/MCP_AND_VERCEL.md).
+  - Bumped package, MCP server metadata, hosted gateway (`SERVER_VERSION`), and `CITATION.cff` to `1.2.0`, and added strict `mypy` type annotations to `scripts/smoke_test.py`.
+
 ## [1.1.0] - 2026-11-07
 
 ### Added

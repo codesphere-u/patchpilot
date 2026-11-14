@@ -1,0 +1,19 @@
+# PatchPilot v1.2.0
+
+> Autonomous Code Repair Engine: Hybrid Stack-Trace + AST Call-Graph + BM25 Fault Localizer, 8-Rule AST Anti-Reward-Hacking Verifier (`RH001`–`RH008`), Snapshot-Backed Transactional Sandbox & Model Context Protocol (MCP) Server.
+
+## Live Site & Key Pages
+- Home: https://codesphere-u.github.io/patchpilot/
+- Interactive Studio (`RH001`–`RH008` Diff Auditor & Token Budget Simulator): https://codesphere-u.github.io/patchpilot/studio.html
+- Reproducible Benchmark & Proof: https://codesphere-u.github.io/patchpilot/proof.html
+- AST Rules (`RH001`–`RH008`) & MCP Tools Matrix: https://codesphere-u.github.io/patchpilot/rules.html
+- Documentation (CLI, Python SDK, MCP, Vercel Gateway): https://codesphere-u.github.io/patchpilot/docs.html
+- Source Code & Releases: https://github.com/codesphere-u/patchpilot
+- Hosted Stateless MCP Gateway: https://patchpilot-eta.vercel.app/mcp
+
+## Core Capabilities
+- `FaultLocalizer` + `ASTSymbolIndex`: Stack-trace parsing, bidirectional Python AST call graph, and BM25 lexical scoring returning minimal line-numbered function slices inside strict token budgets (`96.6%` prompt token reduction, `100.0%` Top-1 recall, `0.393 ms` p50).
+- `PatchIntegrityGuard` (`RH001`–`RH008`): Deterministic AST verifier blocking test deletions/skips (`RH001`), assertion tautologies/weakening (`RH002`), broad exception swallowing (`RH003`), syntax breaks (`RH004`), dangerous primitives (`RH005`), debug leftovers (`RH006`), excessive blast radius (`RH007`), and protected config edits (`RH008`) with `100.0%` recall and `0.0%` FPR in `0.101 ms` p50.
+- `TransactionalPatchWorkspace`: Byte-exact SHA-256 pre-state snapshot and automatic rollback on guard or test failure with cryptographic `RepairReceipt`.
+- `diff_parser` & `aegis_bridge`: Audit raw multi-file unified `git diff` patches and export RFC 6962 `0x00`-prefixed Nexus Aegis `G5_ANTI_REWARD_HACK` attestations.
+- `PatchPilotMCPServer`: JSON-RPC 2.0 MCP server exposing 5 tools, 2 resources, and 2 prompts over stdio, local HTTP/SSE, and Vercel ASGI FastAPI.

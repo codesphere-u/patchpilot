@@ -49,7 +49,7 @@ from patchpilot.sandbox import (
 )
 from patchpilot.server import MCP_TOOLS_SCHEMA, PatchPilotMCPServer
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 __all__ = [
     "DEFAULT_PROTECTED_PATTERNS",
