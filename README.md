@@ -9,6 +9,7 @@
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://patchpilot-eta.vercel.app/mcp)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/patchpilot/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/patchpilot)
+[![M8ven Score](https://m8ven.ai/badge/mcp/codesphere-u-patchpilot-1xskqi)](https://m8ven.ai/mcp/codesphere-u-patchpilot-1xskqi?s=readme)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
 [![Tests Passed](https://img.shields.io/badge/tests-80%20passed-brightgreen.svg)](tests/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero%20runtime-success.svg)](#installation)
