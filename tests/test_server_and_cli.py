@@ -26,7 +26,8 @@ def test_mcp_initialize_ping_and_tools_list():
 
     list_resp = server.handle_request({"jsonrpc": "2.0", "id": 3, "method": "tools/list"})
     assert list_resp is not None
-    tool_names = {t["name"] for t in list_resp["result"]["tools"]}
+    tools = list_resp["result"]["tools"]
+    tool_names = {t["name"] for t in tools}
     assert tool_names == {
         "localize_fault",
         "verify_patch_integrity",
@@ -34,6 +35,10 @@ def test_mcp_initialize_ping_and_tools_list():
         "apply_transactional_patch",
         "inspect_ast_symbols",
     }
+    for tool in tools:
+        ann = tool["annotations"]
+        for key in ("readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"):
+            assert isinstance(ann[key], bool)
 
 
 def test_mcp_tool_call_localize_fault_and_inspect_symbols():

@@ -24,6 +24,12 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
             "Parse and audit a multi-file unified git diff against 8 deterministic AST "
             "anti-reward-hacking & safety rules (RH001–RH008) and export canonical Nexus Aegis G5 leaf attestation."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -51,6 +57,12 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
             "using hybrid Stack-Trace + AST Call-Graph + BM25 token overlap, returning "
             "minimal line-numbered AST slices within a strict token budget."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -91,6 +103,12 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
             "Evaluate a proposed patch (original vs patched files or unified diff) against "
             "8 deterministic AST anti-reward-hacking & safety rules (RH001–RH008)."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -109,14 +127,17 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
                 "max_files_touched": {
                     "type": "integer",
                     "default": 5,
+                    "description": "Maximum number of files a candidate patch is permitted to modify.",
                 },
                 "max_lines_changed": {
                     "type": "integer",
                     "default": 250,
+                    "description": "Maximum added plus deleted lines allowed across the patch.",
                 },
                 "allow_test_modifications": {
                     "type": "boolean",
                     "default": False,
+                    "description": "Whether edits to test files are allowed without triggering RH001-RH002.",
                 },
             },
             "required": ["original_files"],
@@ -129,6 +150,12 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
             "verifying RH001–RH008 and running an optional test command with automatic "
             "byte-exact SHA-256 rollback on failure."
         ),
+        "annotations": {
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -152,6 +179,7 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
                 "suspects_considered": {
                     "type": "array",
                     "items": {"type": "string"},
+                    "description": "Optional ranked suspect symbol names considered before applying the patch.",
                 },
             },
             "required": ["workspace_root"],
@@ -163,6 +191,12 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
             "Query the AST symbol table and bidirectional call graph of a workspace by "
             "symbol name or (file_path, line_number)."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -187,6 +221,7 @@ MCP_TOOLS_SCHEMA: list[dict[str, Any]] = [
                     "description": "1-based line number for enclosing symbol lookup.",
                 },
             },
+            "required": [],
         },
     },
 ]
